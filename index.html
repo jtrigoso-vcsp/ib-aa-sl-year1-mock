@@ -1,0 +1,2873 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrenador Interactivo Mock Final Año 1 - MAE NM | Colegio San Pedro</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- KaTeX CSS & JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script>
+    // Procesamiento temprano del logo institucional con soporte para rutas en GitHub Pages y fallback SVG
+    window.spLogoCandidates = [
+      'Logo-SP-alta (1).jpg',
+      'Logo-SP-alta.jpg',
+      'logo-sp.jpg',
+      'logo-sp.png'
+    ];
+    window.spLogoTryIdx = 0;
+
+    window.processSanPedroLogo = function(imgEl) {
+      try {
+        const canvas = document.getElementById('sp-logo-canvas');
+        const fallback = document.getElementById('sp-logo-fallback');
+        if (!canvas || !imgEl || !imgEl.naturalWidth) return;
+
+        const w = imgEl.naturalWidth;
+        const h = imgEl.naturalHeight;
+        canvas.width = w;
+        canvas.height = h;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(imgEl, 0, 0, w, h);
+
+        const imgData = ctx.getImageData(0, 0, w, h);
+        const data = imgData.data;
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+
+          if (r > 240 && g > 240 && b > 240) {
+            data[i + 3] = 0;
+          } else if (r > 215 && g > 215 && b > 215) {
+            const avg = (r + g + b) / 3;
+            const factor = Math.max(0, Math.min(1, (240 - avg) / 25));
+            data[i + 3] = Math.round(data[i + 3] * factor);
+          }
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+        canvas.classList.remove('hidden');
+        if (fallback) fallback.classList.add('hidden');
+      } catch (e) {
+        window.renderSanPedroFallbackLogo();
+      }
+    };
+
+    window.handleSanPedroLogoError = function(imgEl) {
+      window.spLogoTryIdx += 1;
+      if (window.spLogoTryIdx < window.spLogoCandidates.length && imgEl) {
+        imgEl.src = window.spLogoCandidates[window.spLogoTryIdx];
+      } else {
+        window.renderSanPedroFallbackLogo();
+      }
+    };
+
+    window.renderSanPedroFallbackLogo = function() {
+      const canvas = document.getElementById('sp-logo-canvas');
+      const fallback = document.getElementById('sp-logo-fallback');
+      if (canvas) canvas.classList.add('hidden');
+      if (fallback) fallback.classList.remove('hidden');
+    };
+
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            vcsp: {
+              navy: '#0f3d68',
+              navyDark: '#092744',
+              navyLight: '#1a5288',
+              gold: '#c59b27',
+              goldLight: '#f6ecc9'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #f1f5f9;
+    }
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.35rem 0;
+      margin: 0.45rem 0;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade {
+      animation: fadeIn 0.22s ease-out forwards;
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Encabezado Principal -->
+  <header class="bg-gradient-to-r from-vcsp-navyDark via-vcsp-navy to-vcsp-navyLight text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div class="flex items-center gap-3.5">
+        <!-- Contenedor Logo Transparente Colegio San Pedro -->
+        <div class="shrink-0 bg-white/95 rounded-2xl px-2.5 py-1.5 shadow-sm border border-white/30 flex items-center justify-center">
+          <img
+            src="Logo-SP-alta (1).jpg"
+            alt="Escudo Colegio San Pedro"
+            class="hidden"
+            onload="window.processSanPedroLogo(this)"
+            onerror="window.handleSanPedroLogoError(this)"
+          />
+          <canvas id="sp-logo-canvas" class="h-12 w-auto hidden" aria-label="Logo Colegio San Pedro"></canvas>
+          <!-- Fallback SVG transparente de alta nitidez -->
+          <div id="sp-logo-fallback" class="flex flex-col items-center justify-center px-1 py-0.5 select-none">
+            <svg class="w-9 h-10" viewBox="0 0 100 112" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M50 5L90 22V54C90 80 72 99 50 107C28 99 10 80 10 54V22L50 5Z" fill="#0f3d68" stroke="#64748b" stroke-width="4"/>
+              <path d="M44 12H56V44H84V56H56V99H44V56H16V44H44V12Z" fill="#1d568d" opacity="0.75"/>
+              <text x="50" y="67" text-anchor="middle" fill="#ffffff" font-family="Georgia, serif" font-weight="bold" font-size="38" letter-spacing="-1">SP</text>
+            </svg>
+            <span class="text-[7px] font-extrabold tracking-widest text-vcsp-navy uppercase leading-none mt-0.5">Colegio</span>
+            <span class="text-[8.5px] font-serif font-extrabold text-vcsp-navy leading-tight">SAN PEDRO</span>
+          </div>
+        </div>
+
+        <div>
+          <h1 class="text-lg sm:text-2xl font-extrabold tracking-tight leading-tight">
+            Entrenador Interactivo Mock Final Año 1 — MAE NM
+          </h1>
+          <p class="text-xs sm:text-sm text-sky-100/90 mt-0.5">
+            Problemas integradores estilo PD IB • Sin Calculadora (P1: 60 pts) y Con GDC (P2: 30 pts)
+          </p>
+        </div>
+      </div>
+
+      <!-- Métricas de Avance y Racha -->
+      <div class="flex flex-wrap items-center gap-3 bg-white/10 backdrop-blur-xs border border-white/15 rounded-2xl px-4 py-2.5">
+        <div class="min-w-[155px]">
+          <div class="flex items-center justify-between text-[11px] font-semibold text-sky-100 mb-1">
+            <span>Progreso Global</span>
+            <span id="global-progress-text">0/12 (0/90 pts)</span>
+          </div>
+          <div class="w-full h-2 bg-vcsp-navyDark/70 rounded-full overflow-hidden">
+            <div id="global-progress-bar" class="h-full bg-vcsp-gold transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="h-8 w-px bg-white/15 hidden sm:block"></div>
+
+        <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-400/15 border border-amber-300/30">
+          <span class="text-sm">🔥</span>
+          <div class="leading-tight">
+            <div class="text-[10px] uppercase tracking-wider text-amber-200 font-bold">Racha</div>
+            <div class="text-xs font-extrabold text-white"><span id="streak-counter">0</span> seguidos</div>
+          </div>
+        </div>
+
+        <div id="topic-badges-container" class="flex flex-wrap gap-1"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Barra de Herramientas y Modos -->
+  <section class="bg-white border-b border-slate-200 shadow-2xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+      <!-- Selector de Modo y Filtros -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+          <button id="mode-free-btn" onclick="setStudyMode('free')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-vcsp-navy text-white shadow-2xs transition">
+            🎯 Entrenamiento Libre
+          </button>
+          <button id="mode-timed-btn" onclick="setStudyMode('timed')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition">
+            ⏱️ Desafío Cronometrado
+          </button>
+        </div>
+
+        <!-- Panel Cronómetro -->
+        <div id="timed-controls" class="hidden items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs font-bold">
+          <span>Ritmo IB (1.2 min/pt):</span>
+          <span id="timer-display" class="font-mono text-sm font-extrabold text-rose-700">08:24</span>
+          <button onclick="toggleTimerPause()" id="timer-pause-btn" class="px-2 py-0.5 rounded bg-white border border-rose-300 text-[11px] hover:bg-rose-100">Pausar</button>
+          <button onclick="resetProblemTimer()" class="px-2 py-0.5 rounded bg-white border border-rose-300 text-[11px] hover:bg-rose-100">Reiniciar</button>
+        </div>
+
+        <!-- Filtro por Tema -->
+        <select id="topic-filter-select" onchange="setTopicFilter(this.value)" aria-label="Filtrar por unidad temática" class="px-3 py-1.5 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-vcsp-navy/30">
+          <option value="all">📚 Todos los Temas (1–4)</option>
+          <option value="1">Tema 1: Aritmética y Álgebra</option>
+          <option value="2">Tema 2: Funciones</option>
+          <option value="3">Tema 3: Geometría y Trigonometría</option>
+          <option value="4">Tema 4: Estadística y Probabilidad</option>
+        </select>
+
+        <!-- Filtro por Calculadora -->
+        <select id="calc-filter-select" onchange="setCalcFilter(this.value)" aria-label="Filtrar por uso de calculadora" class="px-3 py-1.5 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-vcsp-navy/30">
+          <option value="all">🧮 P1 y P2 (Todos)</option>
+          <option value="nocalc">🚫 Solo Prueba 1 (Sin Calc.)</option>
+          <option value="gdc">📱 Solo Prueba 2 (Con GDC)</option>
+        </select>
+      </div>
+
+      <!-- Herramientas Pedagógicas IB -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="openModal('formula-modal')" class="px-3.5 py-2 rounded-xl bg-vcsp-goldLight hover:bg-amber-200/80 border border-vcsp-gold/50 text-vcsp-navyDark text-xs font-extrabold transition flex items-center gap-1.5 shadow-2xs">
+          <span>📖</span> Cuadernillo de Fórmulas
+        </button>
+        <button onclick="openSprintModal()" class="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-900 text-xs font-bold transition flex items-center gap-1.5">
+          <span>⚡</span> Sprint Fórmulas (60s)
+        </button>
+        <button onclick="openErrorHuntModal()" class="px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-900 text-xs font-bold transition flex items-center gap-1.5">
+          <span>🕵️</span> Caza Errores IB
+        </button>
+        <button onclick="openDiagnosticModal()" class="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-900 text-xs font-bold transition flex items-center gap-1.5">
+          <span>🎟️</span> Exit Ticket y Diagnóstico
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Panel Lateral de Navegación de Problemas -->
+    <aside class="lg:col-span-3 space-y-4">
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Banco de Problemas</h2>
+          <span id="filtered-count-label" class="text-[11px] font-bold text-vcsp-navy bg-slate-100 px-2 py-0.5 rounded-md">Mostrando 12</span>
+        </div>
+
+        <div id="problem-list" class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-2 gap-2"></div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+          <button id="btn-prev-problem" onclick="navigateProblem(-1)" class="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-xs font-bold text-slate-700 transition">
+            ← Anterior
+          </button>
+          <button id="btn-next-problem" onclick="navigateProblem(1)" class="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-xs font-bold text-slate-700 transition">
+            Siguiente →
+          </button>
+        </div>
+        <div id="nav-position-label" class="text-center text-[11px] text-slate-400 font-medium mt-2">Problema 1 de 12</div>
+      </div>
+
+      <!-- Recordatorio Reglas IB -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-2xs space-y-2 text-xs text-slate-600">
+        <div class="font-extrabold text-vcsp-navy flex items-center gap-1.5">
+          <span>📌</span> Estándar de Calificación IB
+        </div>
+        <ul class="space-y-1.5 list-disc pl-4 leading-relaxed">
+          <li><strong>3 cifras significativas:</strong> Aproxima respuestas no exactas a 3 c.s. (o entero más cercano si se solicita).</li>
+          <li><strong>Procedimiento [M1]:</strong> Usa el borrador para estructurar tus pasos antes de revisar el esquema modelo.</li>
+          <li><strong>Modo Angular:</strong> Verifica grados (<span class="font-mono">DEG</span>) en triángulos y radianes (<span class="font-mono">RAD</span>) en ecuaciones analíticas.</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Área Activa de Resolución -->
+    <section class="lg:col-span-9">
+      <div id="problem-workspace" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"></div>
+    </section>
+  </main>
+
+  <!-- Pie de Página Institucional -->
+  <footer class="bg-white border-t border-slate-200 py-4 px-4 sm:px-6 text-center text-xs text-slate-500">
+    Colegio San Pedro · Programa del Diploma IB — Matemáticas: Análisis y Enfoques NM (Año 1) · Prof. Javier Trigoso | 2026
+  </footer>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 1: CUADERNILLO DE FÓRMULAS ADAPTADO (MAE NM AÑO 1)                -->
+  <!-- ======================================================================= -->
+  <div id="formula-modal" role="dialog" aria-modal="true" aria-labelledby="formula-modal-title" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-fade">
+      <div class="bg-vcsp-navy text-white px-5 py-4 flex items-center justify-between">
+        <div>
+          <h3 id="formula-modal-title" class="font-extrabold text-base sm:text-lg">📖 Cuadernillo de Fórmulas Adaptado — MAE NM (Año 1)</h3>
+          <p class="text-xs text-sky-200">Referencia oficial autorizada para Prueba 1 y Prueba 2</p>
+        </div>
+        <button onclick="closeModal('formula-modal')" aria-label="Cerrar cuadernillo" class="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-white font-bold">✕</button>
+      </div>
+      <div class="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="font-extrabold text-vcsp-navy uppercase tracking-wider">Tema 1: Aritmética y Álgebra</div>
+          <p><strong>1.2 Progresión aritmética:</strong> $u_n = u_1 + (n-1)d$</p>
+          <p>$S_n = \frac{n}{2}(2u_1 + (n-1)d) = \frac{n}{2}(u_1 + u_n)$</p>
+          <p><strong>1.3 Progresión geométrica:</strong> $u_n = u_1 r^{n-1}$, $S_n = \frac{u_1(r^n - 1)}{r - 1}$</p>
+          <p><strong>1.4 Interés compuesto:</strong> $FV = PV \times \left(1 + \frac{r}{100k}\right)^{kn}$</p>
+          <p><strong>1.9 Teorema del binomio:</strong> $(a+b)^n = a^n + \binom{n}{1}a^{n-1}b + \dots + \binom{n}{r}a^{n-r}b^r + \dots + b^n$</p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="font-extrabold text-vcsp-navy uppercase tracking-wider">Tema 2: Funciones</div>
+          <p><strong>2.1 Ecuación de la recta:</strong> $y = mx + c$; $ax + by + d = 0$; $y - y_1 = m(x - x_1)$</p>
+          <p><strong>Pendiente:</strong> $m = \frac{y_2 - y_1}{x_2 - x_1}$; perpendiculares: $m_1 m_2 = -1$</p>
+          <p><strong>2.6 Eje de simetría de $f(x)=ax^2+bx+c$:</strong> $x = -\frac{b}{2a}$</p>
+          <p><strong>2.7 Fórmula cuadrática y discriminante:</strong> $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$, $\Delta = b^2 - 4ac$</p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="font-extrabold text-vcsp-navy uppercase tracking-wider">Tema 3: Geometría y Trigonometría</div>
+          <p><strong>3.2 Teorema del seno:</strong> $\frac{a}{\operatorname{sen} A} = \frac{b}{\operatorname{sen} B} = \frac{c}{\operatorname{sen} C}$</p>
+          <p><strong>Teorema del coseno:</strong> $c^2 = a^2 + b^2 - 2ab\cos C$; $\cos C = \frac{a^2 + b^2 - c^2}{2ab}$</p>
+          <p><strong>Área del triángulo:</strong> $A = \frac{1}{2}ab\operatorname{sen} C$</p>
+          <p><strong>3.5 Identidad pitagórica:</strong> $\cos^2 \theta + \operatorname{sen}^2 \theta = 1$</p>
+          <p><strong>3.6 Ángulo doble:</strong> $\operatorname{sen}(2\theta) = 2\operatorname{sen}\theta\cos\theta$; $\cos(2\theta) = \cos^2\theta - \operatorname{sen}^2\theta = 2\cos^2\theta - 1 = 1 - 2\operatorname{sen}^2\theta$</p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+          <div class="font-extrabold text-vcsp-navy uppercase tracking-wider">Tema 4: Estadística y Probabilidad</div>
+          <p><strong>4.2 Media:</strong> $\bar{x} = \frac{\sum_{i=1}^k f_i x_i}{n}$, donde $n = \sum_{i=1}^k f_i$</p>
+          <p><strong>4.3 Rango intercuartil:</strong> $\text{RIC} = Q_3 - Q_1$ (atípicos si $x &lt; Q_1 - 1.5\,\text{RIC}$ o $x &gt; Q_3 + 1.5\,\text{RIC}$)</p>
+          <p><strong>4.5 Probabilidad de unión:</strong> $P(A \cup B) = P(A) + P(B) - P(A \cap B)$</p>
+          <p><strong>Mutuamente excluyentes:</strong> $P(A \cap B) = 0$</p>
+          <p><strong>4.6 Probabilidad condicionada:</strong> $P(A \mid B) = \frac{P(A \cap B)}{P(B)}$</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 2: SPRINT DE FÓRMULAS (60 SEGUNDOS)                               -->
+  <!-- ======================================================================= -->
+  <div id="sprint-modal" role="dialog" aria-modal="true" aria-labelledby="sprint-modal-title" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-fade">
+      <div class="bg-sky-900 text-white px-5 py-4 flex items-center justify-between">
+        <div>
+          <h3 id="sprint-modal-title" class="font-extrabold text-base sm:text-lg">⚡ Sprint de Búsqueda en el Cuadernillo (60s)</h3>
+          <p class="text-xs text-sky-200">Identifica rápidamente el subtema IB exacto para cada escenario</p>
+        </div>
+        <button onclick="closeSprintModal()" aria-label="Cerrar sprint" class="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-white font-bold">✕</button>
+      </div>
+      <div id="sprint-modal-body" class="p-5 space-y-4"></div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 3: CAZA DE ERRORES TÍPICOS IB                                     -->
+  <!-- ======================================================================= -->
+  <div id="error-hunt-modal" role="dialog" aria-modal="true" aria-labelledby="error-hunt-modal-title" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-fade">
+      <div class="bg-purple-900 text-white px-5 py-4 flex items-center justify-between">
+        <div>
+          <h3 id="error-hunt-modal-title" class="font-extrabold text-base sm:text-lg">🕵️ Caza de Errores Típicos en Exámenes PD IB</h3>
+          <p class="text-xs text-purple-200">Detecta la trampa conceptual antes de cometerla en tu Mock</p>
+        </div>
+        <button onclick="closeModal('error-hunt-modal')" aria-label="Cerrar caza de errores" class="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-white font-bold">✕</button>
+      </div>
+      <div id="error-hunt-modal-body" class="p-5 overflow-y-auto space-y-4"></div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 4: DIAGNÓSTICO IB Y EXIT TICKET PD IB                             -->
+  <!-- ======================================================================= -->
+  <div id="diagnostic-modal" role="dialog" aria-modal="true" aria-labelledby="diagnostic-modal-title" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-fade">
+      <div class="bg-emerald-900 text-white px-5 py-4 flex items-center justify-between">
+        <div>
+          <h3 id="diagnostic-modal-title" class="font-extrabold text-base sm:text-lg">🎟️ Diagnóstico por Unidad y Exit Ticket PD IB</h3>
+          <p class="text-xs text-emerald-200">Calificación final según bandas PD IB (1–7) y ticket descargable para Google Classroom</p>
+        </div>
+        <button onclick="closeModal('diagnostic-modal')" aria-label="Cerrar diagnóstico" class="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center text-white font-bold">✕</button>
+      </div>
+      <div id="diagnostic-modal-body" class="p-5 overflow-y-auto space-y-4"></div>
+    </div>
+  </div>
+
+  <!-- Toast / Message Box Único -->
+  <div id="toast-box" role="status" aria-live="polite" class="fixed bottom-5 right-5 z-50 hidden max-w-sm bg-vcsp-navyDark text-white px-4 py-3 rounded-2xl shadow-xl border border-vcsp-gold/50 text-xs font-medium flex items-center gap-2.5 animate-fade">
+    <span id="toast-icon">ℹ️</span>
+    <span id="toast-message">Mensaje</span>
+  </div>
+
+  <script>
+    // =========================================================================
+    // BANCO COMPLETO DE 12 PROBLEMAS (90 PUNTOS: P1 = 60 PTS, P2 = 30 PTS)
+    // =========================================================================
+    const BASE_PROBLEMS = [
+      {
+        id: 1,
+        title: 'Progresiones Aritméticas y Álgebra',
+        topic: '1',
+        subtopic: 'Subtema 1.2 • Progresiones Aritméticas',
+        calc: 'nocalc',
+        points: 7,
+        variantIndex: 0,
+        hasVariants: true,
+        statement: 'Los tres primeros términos consecutivos de una progresión aritmética están dados por $2k - 1$, $3k + 2$ y $5k - 1$, donde $k \\in \\mathbb{R}$.',
+        parts: [
+          {
+            label: 'a) Halle el valor de $k$ y deduzca el valor de la diferencia común $d$.',
+            marks: 3,
+            inputs: [
+              { id: '1a_k', label: 'Valor de k =', type: 'number', expected: 6, tol: 0.001, placeholder: 'ej. 4' },
+              { id: '1a_d', label: 'Diferencia común d =', type: 'number', expected: 9, tol: 0.001, placeholder: 'ej. 7' }
+            ]
+          },
+          {
+            label: 'b) Determine cuántos términos ($n$) de esta progresión deben sumarse para obtener un total de $616$.',
+            marks: 4,
+            inputs: [
+              { id: '1b_n', label: 'Número de términos n =', type: 'number', expected: 11, tol: 0.001, placeholder: 'ej. 8' }
+            ]
+          }
+        ],
+        hints: [
+          'En toda progresión aritmética, la diferencia entre términos consecutivos es constante: $u_2 - u_1 = u_3 - u_2$. Plantea $(3k+2) - (2k-1) = (5k-1) - (3k+2)$.',
+          'Con $k=6$, el primer término es $u_1 = 11$ y $d = 9$. Usa $S_n = \\frac{n}{2}[2u_1 + (n-1)d] = 616$ y recuerda que $n \\in \\mathbb{Z}^+$.'
+        ],
+        solution: `
+          <p><strong>a) [3 puntos]</strong> Igualando las diferencias consecutivas:</p>
+          <p>$(3k + 2) - (2k - 1) = (5k - 1) - (3k + 2)$ <strong>[M1]</strong></p>
+          <p>$k + 3 = 2k - 3 \\Rightarrow k = 6$ <strong>[A1]</strong></p>
+          <p>Sustituyendo $k = 6$: $u_1 = 2(6) - 1 = 11$ y $u_2 = 3(6) + 2 = 20$, por lo que $d = 20 - 11 = 9$ <strong>[A1]</strong>.</p>
+          <p class="mt-2"><strong>b) [4 puntos]</strong> Aplicando la suma de $n$ términos de una PA:</p>
+          <p>$S_n = \\frac{n}{2}[2(11) + (n - 1)(9)] = 616$ <strong>[M1]</strong></p>
+          <p>$n(9n + 13) = 1232 \\Rightarrow 9n^2 + 13n - 1232 = 0$ <strong>[A1]</strong></p>
+          <p>Factorizando: $(n - 11)(9n + 112) = 0$ <strong>[M1]</strong></p>
+          <p>Como $n \\in \\mathbb{Z}^+$, se descarta $n = -\\frac{112}{9}$ y se concluye $n = 11$ <strong>[A1]</strong>.</p>
+        `
+      },
+      {
+        id: 2,
+        title: 'Coeficientes del Teorema del Binomio',
+        topic: '1',
+        subtopic: 'Subtema 1.9 • Teorema del Binomio',
+        calc: 'nocalc',
+        points: 6,
+        statement: 'En el desarrollo de $(1 + ax)^n$, donde $n \\in \\mathbb{Z}^+$ y $a \\neq 0$, el coeficiente de $x$ es $18$ y el coeficiente de $x^2$ es $135$.',
+        parts: [
+          {
+            label: 'a) Plantee las ecuaciones que relacionan $n$ y $a$.',
+            marks: 2,
+            inputs: [
+              {
+                id: '2a_eq1',
+                label: 'Ecuación 1 (coeficiente de x) =',
+                type: 'equation',
+                vars: ['n', 'a'],
+                lhs: 'n*a',
+                rhs: '18',
+                placeholder: 'ej. na = 12'
+              },
+              {
+                id: '2a_eq2',
+                label: 'Ecuación 2 (coeficiente de x²) =',
+                type: 'equation',
+                vars: ['n', 'a'],
+                lhs: 'n*(n-1)*(a^2)/2',
+                rhs: '135',
+                placeholder: 'ej. n(n-1)a^2/2 = 60'
+              }
+            ]
+          },
+          {
+            label: 'b) Determine $n$ y $a$.',
+            marks: 4,
+            inputs: [
+              { id: '2b_n', label: 'Exponente n =', type: 'number', expected: 6, tol: 0.001, placeholder: 'ej. 5' },
+              { id: '2b_a', label: 'Constante a =', type: 'number', expected: 3, tol: 0.001, placeholder: 'ej. 2' }
+            ]
+          }
+        ],
+        hints: [
+          'Los primeros términos del desarrollo son $1 + \\binom{n}{1}(ax) + \\binom{n}{2}(ax)^2 + \\dots$, donde $\\binom{n}{1} = n$ y $\\binom{n}{2} = \\frac{n(n-1)}{2}$.',
+          'Despeja $a = \\frac{18}{n}$ de la primera ecuación y sustitúyelo en $\\frac{n(n-1)}{2}\\left(\\frac{18}{n}\\right)^2 = 135$.'
+        ],
+        solution: `
+          <p><strong>a) [2 puntos]</strong> Identificando los términos en $x$ y $x^2$:</p>
+          <p>$\\binom{n}{1}a = 18 \\Rightarrow na = 18$ <strong>[A1]</strong></p>
+          <p>$\\binom{n}{2}a^2 = 135 \\Rightarrow \\frac{n(n-1)}{2}a^2 = 135$ <strong>[A1]</strong></p>
+          <p class="mt-2"><strong>b) [4 puntos]</strong> Sustituyendo $a = \\frac{18}{n}$ en la segunda ecuación <strong>[M1]</strong>:</p>
+          <p>$\\frac{n(n-1)}{2} \\cdot \\frac{324}{n^2} = 135 \\Rightarrow \\frac{162(n-1)}{n} = 135$ <strong>[A1]</strong></p>
+          <p>$162n - 162 = 135n \\Rightarrow 27n = 162 \\Rightarrow n = 6$ <strong>[A1]</strong></p>
+          <p>Luego, $a = \\frac{18}{6} = 3$ <strong>[A1]</strong>.</p>
+        `
+      },
+      {
+        id: 3,
+        title: 'Rectas Perpendiculares y Discriminante',
+        topic: '2',
+        subtopic: 'Subtemas 2.1 y 2.7 • Rectas y Cuadráticas',
+        calc: 'nocalc',
+        points: 7,
+        variantIndex: 0,
+        hasVariants: true,
+        statement: 'Una recta $L_1$ tiene ecuación $2x + 3y - 12 = 0$. Otra recta $L_2$ es perpendicular a $L_1$ y pasa por el punto medio del segmento que une $A(-2, 5)$ y $B(6, 1)$.',
+        parts: [
+          {
+            label: 'a) Halle la ecuación de $L_2$ en la forma $ax + by + d = 0$, donde $a, b, d \\in \\mathbb{Z}$ y $a > 0$.',
+            marks: 4,
+            inputs: [
+              { id: '3a_a', label: 'Coeficiente a =', type: 'number', expected: 3, tol: 0.001, placeholder: 'ej. 2' },
+              { id: '3a_b', label: 'Coeficiente b =', type: 'number', expected: -2, tol: 0.001, placeholder: 'ej. -5' },
+              { id: '3a_d', label: 'Término independiente d =', type: 'number', expected: 0, tol: 0.001, placeholder: 'ej. 4' }
+            ]
+          },
+          {
+            label: 'b) La función cuadrática $h(x) = 2x^2 - 8x + p$ no corta al eje $x$. Determine la condición que debe cumplir $p$ para que la gráfica de $h(x)$ no interseque al eje $x$.',
+            marks: 3,
+            inputs: [
+              { id: '3b_p', label: 'Condición: p >', type: 'number', expected: 8, tol: 0.001, placeholder: 'ej. 5' }
+            ]
+          }
+        ],
+        hints: [
+          'Despeja $y$ en $L_1$ para hallar su pendiente $m_1 = -\\frac{2}{3}$. La perpendicular tiene pendiente $m_2 = -\\frac{1}{m_1}$ y pasa por $M\\left(\\frac{-2+6}{2}, \\frac{5+1}{2}\\right)$.',
+          'Para que $h(x)$ no corte al eje $x$, la ecuación $2x^2 - 8x + p = 0$ no debe tener raíces reales, por lo que $\\Delta = b^2 - 4ac < 0$.'
+        ],
+        solution: `
+          <p><strong>a) [4 puntos]</strong> Pendiente de $L_1$: $y = -\\frac{2}{3}x + 4 \\Rightarrow m_1 = -\\frac{2}{3}$, así que $m_2 = \\frac{3}{2}$ <strong>[M1]</strong>.</p>
+          <p>Punto medio $M = \\left(\\frac{-2+6}{2}, \\frac{5+1}{2}\\right) = (2, 3)$ <strong>[A1]</strong>.</p>
+          <p>Ecuación de $L_2$: $y - 3 = \\frac{3}{2}(x - 2) \\Rightarrow 2y - 6 = 3x - 6$ <strong>[M1]</strong>.</p>
+          <p>Ordenando: $3x - 2y = 0$ ($a = 3, b = -2, d = 0$) <strong>[A1]</strong>.</p>
+          <p class="mt-2"><strong>b) [3 puntos]</strong> Condición de ausencia de cortes con el eje $x$: $\\Delta < 0$ <strong>[M1]</strong>.</p>
+          <p>$(-8)^2 - 4(2)(p) < 0 \\Rightarrow 64 - 8p < 0$ <strong>[A1]</strong></p>
+          <p>$8p > 64 \\Rightarrow p > 8$ <strong>[A1]</strong>.</p>
+        `
+      },
+      {
+        id: 4,
+        title: 'Ecuaciones e Identidades Trigonométricas',
+        topic: '3',
+        subtopic: 'Subtemas 3.5 y 3.6 • Ángulo Doble',
+        calc: 'nocalc',
+        points: 7,
+        statement: 'Considere la ecuación trigonométrica $\\cos(2x) + 3\\operatorname{sen} x = 2$ para $0 \\le x \\le 2\\pi$.',
+        parts: [
+          {
+            label: 'a) Reescriba la ecuación en términos de $\\operatorname{sen} x$ y factorice la expresión obtenida igualada a cero.',
+            marks: 3,
+            inputs: [
+              {
+                id: '4a_fact',
+                label: 'Expresión factorizada (= 0) =',
+                type: 'factored_trig',
+                vars: ['x'],
+                targetExpr: '(2*sin(x) - 1)*(sin(x) - 1)',
+                placeholder: 'ej. (2sen(x)+1)(sen(x)-1)'
+              }
+            ]
+          },
+          {
+            label: 'b) Determine todas las soluciones exactas de la ecuación en el intervalo $0 \\le x \\le 2\\pi$ (en orden creciente).',
+            marks: 4,
+            inputs: [
+              { id: '4b_x1', label: 'Solución x₁ =', type: 'number', expected: Math.PI / 6, tol: 0.002, placeholder: 'ej. π/4' },
+              { id: '4b_x2', label: 'Solución x₂ =', type: 'number', expected: Math.PI / 2, tol: 0.002, placeholder: 'ej. π/3' },
+              { id: '4b_x3', label: 'Solución x₃ =', type: 'number', expected: (5 * Math.PI) / 6, tol: 0.002, placeholder: 'ej. 3π/4' }
+            ]
+          }
+        ],
+        hints: [
+          'Usa la identidad $\\cos(2x) = 1 - 2\\operatorname{sen}^2 x$ para transformar toda la ecuación a una cuadrática en $\\operatorname{sen} x$.',
+          'De $2\\operatorname{sen}^2 x - 3\\operatorname{sen} x + 1 = 0$ obtienes $(2\\operatorname{sen} x - 1)(\\operatorname{sen} x - 1) = 0$. Recuerda que $\\operatorname{sen} x > 0$ en el primer y segundo cuadrante.'
+        ],
+        solution: `
+          <p><strong>a) [3 puntos]</strong> Sustituyendo $\\cos(2x) = 1 - 2\\operatorname{sen}^2 x$ <strong>[M1]</strong>:</p>
+          <p>$1 - 2\\operatorname{sen}^2 x + 3\\operatorname{sen} x = 2 \\Rightarrow 2\\operatorname{sen}^2 x - 3\\operatorname{sen} x + 1 = 0$ <strong>[A1]</strong></p>
+          <p>Factorizando: $(2\\operatorname{sen} x - 1)(\\operatorname{sen} x - 1) = 0$ <strong>[A1]</strong>.</p>
+          <p class="mt-2"><strong>b) [4 puntos]</strong> Resolviendo cada factor en $[0, 2\\pi]$:</p>
+          <p>• $\\operatorname{sen} x = \\frac{1}{2} \\Rightarrow x_1 = \\frac{\\pi}{6}$ (1.er cuadrante) <strong>[A1]</strong> y $x_3 = \\pi - \\frac{\\pi}{6} = \\frac{5\\pi}{6}$ (2.º cuadrante) <strong>[A1]</strong>.</p>
+          <p>• $\\operatorname{sen} x = 1 \\Rightarrow x_2 = \\frac{\\pi}{2}$ <strong>[A1]</strong>.</p>
+          <p>Conjunto solución ordenado: $x \\in \\left\\{\\frac{\\pi}{6},\\; \\frac{\\pi}{2},\\; \\frac{5\\pi}{6}\\right\\}$ <strong>[A1]</strong>.</p>
+        `
+      },
+      {
+        id: 5,
+        title: 'Probabilidad Condicionada y Sucesos',
+        topic: '4',
+        subtopic: 'Subtemas 4.5 y 4.6 • Probabilidad',
+        calc: 'nocalc',
+        points: 6,
+        statement: 'Para dos sucesos $A$ y $B$ se sabe que $P(A) = 0,45$, $P(A \\mid B) = 0,3$ y $P(B \\mid A) = 0,4$.',
+        parts: [
+          {
+            label: 'a) Calcule el valor exacto de $P(A \\cap B)$.',
+            marks: 2,
+            inputs: [
+              { id: '5a_inter', label: 'P(A ∩ B) =', type: 'number', expected: 0.18, tol: 0.001, placeholder: 'ej. 0.25' }
+            ]
+          },
+          {
+            label: 'b) Halle $P(B)$ y posteriormente determine $P(A \\cup B)$.',
+            marks: 2,
+            inputs: [
+              { id: '5b_pb', label: 'P(B) =', type: 'number', expected: 0.6, tol: 0.001, placeholder: 'ej. 0.50' },
+              { id: '5b_union', label: 'P(A ∪ B) =', type: 'number', expected: 0.87, tol: 0.001, placeholder: 'ej. 0.75' }
+            ]
+          },
+          {
+            label: 'c) Indique si $A$ y $B$ son mutuamente excluyentes.',
+            marks: 2,
+            inputs: [
+              {
+                id: '5c_excl',
+                label: '¿Son mutuamente excluyentes?',
+                type: 'select',
+                expected: 'no',
+                options: [
+                  { value: '', label: 'Selecciona una conclusión...' },
+                  { value: 'si', label: 'Sí, porque P(A ∪ B) < 1' },
+                  { value: 'no', label: 'No, porque P(A ∩ B) = 0,18 ≠ 0' }
+                ]
+              }
+            ]
+          }
+        ],
+        hints: [
+          'Usa la definición $P(B \\mid A) = \\frac{P(A \\cap B)}{P(A)}$, de donde $P(A \\cap B) = P(B \\mid A) \\cdot P(A)$.',
+          'Luego despeja $P(B) = \\frac{P(A \\cap B)}{P(A \\mid B)}$ y aplica $P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$.'
+        ],
+        solution: `
+          <p><strong>a) [2 puntos]</strong> $P(A \\cap B) = P(B \\mid A) \\cdot P(A) = 0,4 \\times 0,45 = 0,18$ <strong>[M1][A1]</strong>.</p>
+          <p class="mt-2"><strong>b) [2 puntos]</strong> $P(B) = \\frac{P(A \\cap B)}{P(A \\mid B)} = \\frac{0,18}{0,3} = 0,6$ <strong>[A1]</strong>.</p>
+          <p>$P(A \\cup B) = 0,45 + 0,6 - 0,18 = 0,87$ <strong>[A1]</strong>.</p>
+          <p class="mt-2"><strong>c) [2 puntos]</strong> No son mutuamente excluyentes <strong>[A1]</strong>, ya que $P(A \\cap B) = 0,18 \\neq 0$ (pueden ocurrir simultáneamente) <strong>[R1]</strong>.</p>
+        `
+      },
+      {
+        id: 6,
+        title: 'Inversa, Composición y Traslaciones',
+        topic: '2',
+        subtopic: 'Subtemas 2.2, 2.5 y 2.6 • Funciones',
+        calc: 'nocalc',
+        points: 12,
+        statement: 'Considere las funciones $f(x) = \\frac{2x + 1}{x - 3}$ para $x \\neq 3$, y $g(x) = x^2 - 4$ para $x \\in \\mathbb{R}$.',
+        parts: [
+          {
+            label: 'a) Halle la expresión de la función inversa $f^{-1}(x)$ e indique el valor de $x$ excluido de su dominio.',
+            marks: 4,
+            inputs: [
+              {
+                id: '6a_inv',
+                label: 'Expresión f⁻¹(x) =',
+                type: 'algebraic',
+                vars: ['x'],
+                targetExpr: '(3*x + 1)/(x - 2)',
+                testPoints: [-1, 0, 1, 3, 4],
+                placeholder: 'ej. (4x+1)/(x-3)'
+              },
+              { id: '6a_dom', label: 'Valor excluido x ≠', type: 'number', expected: 2, tol: 0.001, placeholder: 'ej. 5' }
+            ]
+          },
+          {
+            label: 'b) Resuelva la ecuación $(f \\circ g)(x) = 3$ (indique las dos soluciones exactas ordenadas).',
+            marks: 4,
+            inputs: [
+              { id: '6b_x1', label: 'Solución menor x₁ =', type: 'number', expected: -Math.sqrt(14), tol: 0.002, placeholder: 'ej. -√(10)' },
+              { id: '6b_x2', label: 'Solución mayor x₂ =', type: 'number', expected: Math.sqrt(14), tol: 0.002, placeholder: 'ej. √(10)' }
+            ]
+          },
+          {
+            label: 'c) La gráfica de $y = g(x)$ se traslada mediante el vector $\\begin{pmatrix} 2 \\\\ -5 \\end{pmatrix}$ para obtener $y = q(x)$. Halle las coordenadas del vértice de $q(x)$.',
+            marks: 4,
+            inputs: [
+              { id: '6c_vx', label: 'Abscisa del vértice h =', type: 'number', expected: 2, tol: 0.001, placeholder: 'ej. -1' },
+              { id: '6c_vy', label: 'Ordenada del vértice k =', type: 'number', expected: -9, tol: 0.001, placeholder: 'ej. -6' }
+            ]
+          }
+        ],
+        hints: [
+          'Para hallar $f^{-1}(x)$, intercambia $x$ e $y$ en $y = \\frac{2x+1}{x-3}$ y despeja $y$: $x(y-3) = 2y+1$. El denominador de $f^{-1}(x)$ no puede ser cero.',
+          'Recuerda que $(f \\circ g)(x) = 3 \\iff g(x) = f^{-1}(3)$, o sustituye $g(x) = x^2 - 4$ dentro de $f$. Para la traslación, $q(x) = g(x - 2) - 5$.'
+        ],
+        solution: `
+          <p><strong>a) [4 puntos]</strong> Intercambiando variables: $x = \\frac{2y + 1}{y - 3} \\Rightarrow xy - 3x = 2y + 1$ <strong>[M1]</strong></p>
+          <p>$y(x - 2) = 3x + 1 \\Rightarrow f^{-1}(x) = \\frac{3x + 1}{x - 2}$ <strong>[A2]</strong>, con dominio $x \\neq 2$ <strong>[A1]</strong>.</p>
+          <p class="mt-2"><strong>b) [4 puntos]</strong> $(f \\circ g)(x) = 3 \\Rightarrow g(x) = f^{-1}(3) = \\frac{3(3)+1}{3-2} = 10$ <strong>[M1][A1]</strong>.</p>
+          <p>$x^2 - 4 = 10 \\Rightarrow x^2 = 14 \\Rightarrow x = \\pm\\sqrt{14}$ <strong>[M1][A1]</strong>.</p>
+          <p class="mt-2"><strong>c) [4 puntos]</strong> $q(x) = g(x - 2) - 5 = (x - 2)^2 - 4 - 5 = (x - 2)^2 - 9 = x^2 - 4x - 5$ <strong>[M1][A1]</strong>.</p>
+          <p>El vértice original $(0, -4)$ se traslada a $V(2, -9)$ <strong>[A2]</strong>.</p>
+        `
+      },
+      {
+        id: 7,
+        title: 'Comparación Financiera e Interés Compuesto',
+        topic: '1',
+        subtopic: 'Subtema 1.4 • Aplicaciones Financieras',
+        calc: 'gdc',
+        points: 7,
+        gdcGuide: {
+          ti84: 'Apps → 1:Finance → 1:TVM Solver. Inciso a): N = 16, I% = 5.2, PMT = 0, FV = 25000, P/Y = 1, C/Y = 2 → ALPHA + ENTER sobre PV. Inciso b): N = 96, PV = -15000, PMT = 0, FV = 25000, P/Y = 1, C/Y = 12 → ALPHA + ENTER sobre I%.',
+          casio: 'Menu → TVM → F2 (Compound Interest). Inciso a): n = 16, I% = 5.2, PMT = 0, FV = 25000, P/Y = 1, C/Y = 2 → F3 (PV). Inciso b): n = 96, PV = -15000, PMT = 0, FV = 25000, P/Y = 1, C/Y = 12 → F2 (I%).'
+        },
+        tokNote: '¿Hasta qué punto los modelos financieros con tasa nominal constante reflejan el comportamiento real de la economía a largo plazo?',
+        statement: 'Sofía desea reunir $\\$25\\,000$ dentro de $8$ años para sus estudios universitarios. Un banco le ofrece una cuenta con una tasa nominal anual del $5,2\\%$ capitalizable semestralmente.',
+        parts: [
+          {
+            label: 'a) Calcule el capital inicial ($PV$) que Sofía debe depositar hoy para alcanzar su meta. Redondee al dólar más cercano.',
+            marks: 3,
+            inputs: [
+              { id: '7a_pv', label: 'Capital inicial PV ($) =', type: 'number', expected: 16580, tol: 0.5, placeholder: 'ej. 14250' }
+            ]
+          },
+          {
+            label: 'b) Si en cambio Sofía deposita $\\$15\\,000$ hoy en otra entidad que capitaliza mensualmente y logra reunir los $\\$25\\,000$ en los mismos $8$ años, halle la tasa nominal anual ($r\\%$) que ofrece esta segunda entidad (a 3 c.s.).',
+            marks: 4,
+            inputs: [
+              { id: '7b_r', label: 'Tasa nominal r (%) =', type: 'number', expected: 6.40, tol: 0.02, placeholder: 'ej. 5.85' }
+            ]
+          }
+        ],
+        hints: [
+          'Usa $FV = PV\\left(1 + \\frac{r}{100k}\\right)^{kn}$ con $FV = 25\\,000$, $r = 5,2$, $k = 2$ (semestral) y $n = 8$.',
+          'En el apartado b), $k = 12$ (mensual), $kn = 96$ períodos y $25\\,000 = 15\\,000\\left(1 + \\frac{r}{1200}\\right)^{96}$.'
+        ],
+        solution: `
+          <p><strong>a) [3 puntos]</strong> Sustituyendo en la fórmula de interés compuesto con $k = 2$, $n = 8$ ($kn = 16$):</p>
+          <p>$25\\,000 = PV\\left(1 + \\frac{5,2}{100 \\times 2}\\right)^{16} = PV(1,026)^{16}$ <strong>[M1]</strong></p>
+          <p>$PV = \\frac{25\\,000}{1,026^{16}} \\approx 16\\,580,06$ <strong>[A1]</strong></p>
+          <p>Redondeado al dólar más cercano: $\\$16\\,580$ <strong>[A1]</strong>.</p>
+          <p class="mt-2"><strong>b) [4 puntos]</strong> Con capitalización mensual ($k = 12$, $kn = 96$):</p>
+          <p>$25\\,000 = 15\\,000\\left(1 + \\frac{r}{1200}\\right)^{96} \\Rightarrow \\frac{5}{3} = \\left(1 + \\frac{r}{1200}\\right)^{96}$ <strong>[M1][A1]</strong></p>
+          <p>$1 + \\frac{r}{1200} = \\left(\\frac{5}{3}\\right)^{1/96} \\approx 1,0053356$ <strong>[M1]</strong></p>
+          <p>$r \\approx 1200 \\times 0,0053356 \\approx 6,40\\%$ (a 3 c.s.) <strong>[A1]</strong>.</p>
+        `
+      },
+      {
+        id: 8,
+        title: 'Rumbos, Teorema del Coseno y Área',
+        topic: '3',
+        subtopic: 'Subtema 3.2 • Resolución de Triángulos',
+        calc: 'gdc',
+        points: 7,
+        gdcGuide: {
+          ti84: 'Verifica MODE → DEGREE. Calcula √(18² + 24² − 2×18×24×cos(75)) para AB. Para el ángulo obtuso con igual seno: 180 − 75.',
+          casio: 'Verifica SHIFT MENU (SET UP) → Angle: Deg. En RUN-MATRIX calcula √(18² + 24² − 2×18×24×cos(75)).'
+        },
+        tokNote: '¿Cómo influye la elección entre grados sexagesimales y radianes en la modelación geométrica y en la interpretación de resultados tecnológicos?',
+        statement: 'Dos embarcaciones parten simultáneamente desde un puerto $O$. La embarcación $A$ navega $18\\text{ km}$ con rumbo $040^\\circ$ y la embarcación $B$ navega $24\\text{ km}$ con rumbo $115^\\circ$.',
+        parts: [
+          {
+            label: 'a) Calcule la distancia directa entre ambas embarcaciones en ese instante (a 3 c.s.).',
+            marks: 3,
+            inputs: [
+              { id: '8a_dist', label: 'Distancia AB (km) =', type: 'number', expected: 26.1, tol: 0.1, diagRadVal: 21.8, diagRadMsg: 'Parece que tu calculadora está en RADIANES en lugar de GRADOS (DEG).', placeholder: 'ej. 22.4' }
+            ]
+          },
+          {
+            label: 'b) Si las dos embarcaciones mantienen sus distancias respecto al puerto ($18\\text{ km}$ y $24\\text{ km}$), pero el ángulo comprendido entre sus trayectorias cambia, determine el otro ángulo obtuso que permite conservar el área del triángulo $OAB$.',
+            marks: 4,
+            inputs: [
+              { id: '8b_ang', label: 'Ángulo obtuso (°) =', type: 'number', expected: 105, tol: 0.1, placeholder: 'ej. 120' }
+            ]
+          }
+        ],
+        hints: [
+          'El ángulo comprendido $\\widehat{AOB}$ es la diferencia entre ambos rumbos: $115^\\circ - 40^\\circ = 75^\\circ$. Aplica el teorema del coseno.',
+          'El área es $\\frac{1}{2}(18)(24)\\operatorname{sen}\\theta$. Como $\\operatorname{sen}(180^\\circ - \\theta) = \\operatorname{sen}\\theta$, busca el suplemento de $75^\\circ$.'
+        ],
+        solution: `
+          <p><strong>a) [3 puntos]</strong> Ángulo entre trayectorias: $\\widehat{AOB} = 115^\\circ - 40^\\circ = 75^\\circ$ <strong>[A1]</strong>.</p>
+          <p>Por el teorema del coseno:</p>
+          <p>$AB^2 = 18^2 + 24^2 - 2(18)(24)\\cos(75^\\circ) = 324 + 576 - 864\\cos(75^\\circ) \\approx 676,38$ <strong>[M1]</strong></p>
+          <p>$AB \\approx 26,007 \\rightarrow 26,1\\text{ km}$ (o $26,0\\text{ km}$ según redondeo intermedio; aceptado $26,0$–$26,1\\text{ km}$) <strong>[A1]</strong>.</p>
+          <p class="mt-2"><strong>b) [4 puntos]</strong> Para conservar el área $\\frac{1}{2}(18)(24)\\operatorname{sen}\\theta = \\frac{1}{2}(18)(24)\\operatorname{sen}(75^\\circ)$ <strong>[M1]</strong>:</p>
+          <p>$\\operatorname{sen}\\theta = \\operatorname{sen}(75^\\circ)$ <strong>[A1]</strong></p>
+          <p>Como $0^\\circ < \\theta < 180^\\circ$ y $\\theta \\neq 75^\\circ$, el ángulo obtuso es $\\theta = 180^\\circ - 75^\\circ = 105^\\circ$ <strong>[M1][A1]</strong>.</p>
+        `
+      },
+      {
+        id: 9,
+        title: 'Inferencia Estadística, Cuartiles y Regresión',
+        topic: '4',
+        subtopic: 'Subtemas 4.2, 4.3 y 4.4 • Estadística Bivariante',
+        calc: 'gdc',
+        points: 10,
+        gdcGuide: {
+          ti84: 'STAT → Edit: ingresa los 9 datos en L1 una vez hallados a y b. STAT → CALC → 1:1-Var Stats (List: L1, FreqList: vacío) para comprobar x̄ = 24, Q1 = 17 y Q3 = 28 (convención estándar IB de medianas de las mitades).',
+          casio: 'STAT → List 1: ingresa los 9 datos. F6 (SET) → verifica 1Var Freq: 1 y Q1Q3 Type: Std (convención estándar IB). Luego F2 (CALC) → F1 (1-VAR).'
+        },
+        tokNote: '¿Por qué es epistemológicamente riesgoso extrapolar más allá del dominio observado o invertir una recta de regresión de y sobre x?',
+        statement: 'Un conjunto ordenado de $9$ mediciones de temperatura (en $^\\circ\\text{C}$) es: $12,\\; 16,\\; a,\\; 20,\\; 22,\\; 24,\\; b,\\; 29,\\; 48$. Siguiendo la convención estándar del PD IB (donde $Q_1$ y $Q_3$ son las medianas de las mitades inferior y superior excluyendo la mediana central), se sabe que la media es $24\\,^\\circ\\text{C}$ y el Rango Intercuartil ($\\text{RIC}$) es $11\\,^\\circ\\text{C}$.',
+        parts: [
+          {
+            label: 'a) Determine los valores exactos de $a$ y $b$.',
+            marks: 4,
+            inputs: [
+              { id: '9a_a', label: 'Valor de a =', type: 'number', expected: 18, tol: 0.001, placeholder: 'ej. 17' },
+              { id: '9a_b', label: 'Valor de b =', type: 'number', expected: 27, tol: 0.001, placeholder: 'ej. 26' }
+            ]
+          },
+          {
+            label: 'b) Calcule la frontera superior para valores atípicos ($Q_3 + 1,5\\,\\text{RIC}$) e indique si $48\\,^\\circ\\text{C}$ es un valor atípico.',
+            marks: 2,
+            inputs: [
+              { id: '9b_lim', label: 'Frontera superior (°C) =', type: 'number', expected: 44.5, tol: 0.01, placeholder: 'ej. 42.0' },
+              {
+                id: '9b_out',
+                label: '¿Es 48 °C un valor atípico?',
+                type: 'select',
+                expected: 'si',
+                options: [
+                  { value: '', label: 'Selecciona una conclusión...' },
+                  { value: 'si', label: 'Sí, porque 48 > 44,5' },
+                  { value: 'no', label: 'No, porque 48 < 44,5' }
+                ]
+              }
+            ]
+          },
+          {
+            label: 'c) La recta de regresión del consumo eléctrico $y$ (kWh) sobre la temperatura $x$ ($^\\circ\\text{C}$) es $y = 3,4x + 18,5$. Halle la media del consumo eléctrico $\\bar{y}$ (a 3 c.s.).',
+            marks: 4,
+            inputs: [
+              { id: '9c_ybar', label: 'Media ȳ (kWh) =', type: 'number', expected: 100.1, tol: 0.1, placeholder: 'ej. 95.4' }
+            ]
+          }
+        ],
+        hints: [
+          'La mediana es el 5.º dato ($22$). La mitad inferior es $\\{12, 16, a, 20\\} \\Rightarrow Q_1 = \\frac{16+a}{2}$, y la superior es $\\{24, b, 29, 48\\} \\Rightarrow Q_3 = \\frac{b+29}{2}$.',
+          'Usa $Q_3 - Q_1 = 11$ y $\\frac{12+16+a+20+22+24+b+29+48}{9} = 24 \\Rightarrow a + b = 45$. Además, toda recta de regresión pasa por el centroide $(\\bar{x}, \\bar{y})$.'
+        ],
+        solution: `
+          <p><strong>a) [4 puntos]</strong> De la media: $\\frac{171 + a + b}{9} = 24 \\Rightarrow a + b = 45$ <strong>[M1]</strong>.</p>
+          <p>Con la mediana en $22$, $Q_1 = \\frac{16+a}{2}$ y $Q_3 = \\frac{b+29}{2}$. Del $\\text{RIC} = 11$: $\\frac{b+29}{2} - \\frac{16+a}{2} = 11 \\Rightarrow b - a = 9$ <strong>[M1]</strong>.</p>
+          <p>Resolviendo el sistema $a + b = 45$ y $b - a = 9$: $2b = 54 \\Rightarrow b = 27$ <strong>[A1]</strong> y $a = 18$ <strong>[A1]</strong> (con $Q_1 = 17$ y $Q_3 = 28$).</p>
+          <p class="mt-2"><strong>b) [2 puntos]</strong> Frontera superior $= Q_3 + 1,5(\\text{RIC}) = 28 + 1,5(11) = 44,5\\,^\\circ\\text{C}$ <strong>[A1]</strong>. Como $48 > 44,5$, sí constituye un valor atípico superior <strong>[R1]</strong>.</p>
+          <p class="mt-2"><strong>c) [4 puntos]</strong> El centroide $(\\bar{x}, \\bar{y})$ pertenece a la recta de regresión <strong>[M1]</strong>:</p>
+          <p>$\\bar{y} = 3,4(24) + 18,5 = 81,6 + 18,5 = 100,1\\text{ kWh}$ ($100$ a 3 c.s.) <strong>[A2]</strong>.</p>
+          <p>Nota IB: No debe usarse esta ecuación para predecir $x$ dado $y = 150\\text{ kWh}$ porque la recta es de $y$ sobre $x$ (no de $x$ sobre $y$) y además $150\\text{ kWh}$ está fuera del rango observado (extrapolación) <strong>[R1]</strong>.</p>
+        `
+      },
+      {
+        id: 10,
+        title: 'Progresión Aritmética y Ángulo Doble',
+        topic: '1',
+        subtopic: 'Subtemas 1.2 y 3.6 • Síntesis Mixta',
+        calc: 'nocalc',
+        points: 7,
+        statement: 'El primer término de una progresión aritmética es $u_1 = \\cos^2 \\alpha$ y el segundo término es $u_2 = 1$, donde $0 < \\alpha < \\frac{\\pi}{2}$.',
+        parts: [
+          {
+            label: 'a) Determine la diferencia común $d$ en su forma más simple en términos de $\\operatorname{sen} \\alpha$.',
+            marks: 1,
+            inputs: [
+              {
+                id: '10a_d',
+                label: 'Diferencia común d =',
+                type: 'algebraic',
+                vars: ['α'],
+                targetExpr: 'sin(α)^2',
+                testPoints: [0.2, 0.5, 0.9, 1.2],
+                placeholder: 'ej. cos²(α)'
+              }
+            ]
+          },
+          {
+            label: 'b) Halle una expresión para la suma de los primeros $4$ términos $S_4$ en términos de $\\cos^2 \\alpha$ y $\\operatorname{sen}^2 \\alpha$ (antes de aplicar identidades de ángulo doble).',
+            marks: 3,
+            inputs: [
+              {
+                id: '10b_s4',
+                label: 'Expresión S₄ =',
+                type: 'algebraic',
+                vars: ['α'],
+                targetExpr: '4*cos(α)^2 + 6*sin(α)^2',
+                testPoints: [0.2, 0.5, 0.9, 1.2],
+                placeholder: 'ej. 3cos²(α) + 5sen²(α)'
+              }
+            ]
+          },
+          {
+            label: 'c) Muestre que $S_4$ puede escribirse en la forma $A + B\\cos(2\\alpha)$ e indique los valores enteros de $A$ y $B$.',
+            marks: 3,
+            inputs: [
+              { id: '10c_A', label: 'Constante A =', type: 'number', expected: 5, tol: 0.001, placeholder: 'ej. 4' },
+              { id: '10c_B', label: 'Constante B =', type: 'number', expected: -1, tol: 0.001, placeholder: 'ej. -2' }
+            ]
+          }
+        ],
+        hints: [
+          'Calcula $d = u_2 - u_1 = 1 - \\cos^2\\alpha$ y aplica la identidad pitagórica $\\cos^2\\alpha + \\operatorname{sen}^2\\alpha = 1$.',
+          'Usa $S_4 = \\frac{4}{2}(2u_1 + 3d) = 4\\cos^2\\alpha + 6\\operatorname{sen}^2\\alpha = 4(\\cos^2\\alpha + \\operatorname{sen}^2\\alpha) + 2\\operatorname{sen}^2\\alpha$, y sustituye $2\\operatorname{sen}^2\\alpha = 1 - \\cos(2\\alpha)$.'
+        ],
+        solution: `
+          <p><strong>a) [1 punto]</strong> $d = u_2 - u_1 = 1 - \\cos^2\\alpha = \\operatorname{sen}^2\\alpha$ <strong>[A1]</strong>.</p>
+          <p class="mt-2"><strong>b) [3 puntos]</strong> Aplicando $S_n = \\frac{n}{2}[2u_1 + (n-1)d]$ con $n = 4$ <strong>[M1]</strong>:</p>
+          <p>$S_4 = \\frac{4}{2}(2\\cos^2\\alpha + 3\\operatorname{sen}^2\\alpha) = 4\\cos^2\\alpha + 6\\operatorname{sen}^2\\alpha$ <strong>[A2]</strong>.</p>
+          <p class="mt-2"><strong>c) [3 puntos]</strong> Agrupando mediante la identidad pitagórica <strong>[M1]</strong>:</p>
+          <p>$S_4 = 4(\\cos^2\\alpha + \\operatorname{sen}^2\\alpha) + 2\\operatorname{sen}^2\\alpha = 4(1) + (1 - \\cos(2\\alpha))$ <strong>[M1]</strong></p>
+          <p>$S_4 = 5 - \\cos(2\\alpha) \\Rightarrow A = 5,\\; B = -1$ <strong>[A1]</strong>.</p>
+        `
+      },
+      {
+        id: 11,
+        title: 'Frecuencias Agrupadas y Dispersión con GDC',
+        topic: '4',
+        subtopic: 'Subtemas 4.2 y 4.3 • Tablas de Frecuencia',
+        calc: 'gdc',
+        points: 6,
+        gdcGuide: {
+          ti84: 'STAT → Edit: ingresa x (0 a 5) en L1 y f (3, 7, 12, 8, 4, 2) en L2. Luego STAT → CALC → 1:1-Var Stats con List: L1 y FreqList: L2 (convención estándar IB de medianas de las mitades).',
+          casio: 'STAT: ingresa x en List 1 y f en List 2. Pulsa F2 (CALC) → F6 (SET) y verifica 1Var XList: List1, 1Var Freq: List2 y Q1Q3 Type: Std. Luego pulsa F1 (1-VAR).'
+        },
+        statement: 'La siguiente tabla muestra el número de libros leídos ($x$) durante el año por un grupo de estudiantes: $x \\in \\{0, 1, 2, 3, 4, 5\\}$ con frecuencias respectivas $f \\in \\{3,\\; 7,\\; k,\\; 8,\\; 4,\\; 2\\}$. Para los cuartiles, utilice la convención estándar del PD IB (medianas de las mitades inferior y superior) configurando correctamente la lista de frecuencias en su GDC.',
+        parts: [
+          {
+            label: 'a) Si la media de libros leídos es exactamente $2,25$, halle el valor de $k$.',
+            marks: 3,
+            inputs: [
+              { id: '11a_k', label: 'Frecuencia k =', type: 'number', expected: 12, tol: 0.001, placeholder: 'ej. 10' }
+            ]
+          },
+          {
+            label: 'b) Con el valor de $k$ hallado, use su GDC para determinar la mediana y el Rango Intercuartil ($\\text{RIC}$) de la distribución.',
+            marks: 3,
+            inputs: [
+              { id: '11b_med', label: 'Mediana =', type: 'number', expected: 2, tol: 0.001, placeholder: 'ej. 2.5' },
+              { id: '11b_iqr', label: 'RIC (Q₃ − Q₁) =', type: 'number', expected: 2, tol: 0.001, placeholder: 'ej. 1.5' }
+            ]
+          }
+        ],
+        hints: [
+          'La suma total de frecuencias es $n = 24 + k$ y $\\sum f_i x_i = 0(3)+1(7)+2k+3(8)+4(4)+5(2) = 57 + 2k$. Iguala $\\frac{57+2k}{24+k} = 2,25$.',
+          'Con $k = 12$ hay $n = 36$ estudiantes. En tu GDC ingresa $x$ en L1 y $f$ en L2 (verificando <code class="font-mono">FreqList: L2</code>) para leer $Q_1 = 1$, $\\text{Med} = 2$ y $Q_3 = 3$.'
+        ],
+        solution: `
+          <p><strong>a) [3 puntos]</strong> Planteando la ecuación de la media ponderada:</p>
+          <p>$\\bar{x} = \\frac{0(3) + 1(7) + 2k + 3(8) + 4(4) + 5(2)}{3 + 7 + k + 8 + 4 + 2} = \\frac{57 + 2k}{24 + k} = 2,25$ <strong>[M1][A1]</strong></p>
+          <p>$57 + 2k = 54 + 2,25k \\Rightarrow 0,25k = 3 \\Rightarrow k = 12$ <strong>[A1]</strong>.</p>
+          <p class="mt-2"><strong>b) [3 puntos]</strong> Con $k = 12$, el total de datos es $n = 36$. Configurando <code class="font-mono bg-white px-1 rounded border border-emerald-200">FreqList: L2</code> y modo estándar IB en la GDC <strong>[M1]</strong>:</p>
+          <p>$Q_1 = 1$, $\\text{Mediana} = 2$ <strong>[A1]</strong> y $Q_3 = 3$, por lo que $\\text{RIC} = 3 - 1 = 2$ <strong>[A1]</strong>.</p>
+        `
+      },
+      {
+        id: 12,
+        title: 'Ausencia de Tangencia mediante Completación de Cuadrados',
+        topic: '2',
+        subtopic: 'Subtema 2.7 • Análisis de Positividad del Discriminante',
+        calc: 'nocalc',
+        points: 8,
+        variantIndex: 0,
+        hasVariants: true,
+        statement: 'Considere la familia de parábolas $y = kx^2 + (k + 3)x + 1$, donde $k \\in \\mathbb{R},\\; k \\neq 0$.',
+        parts: [
+          {
+            label: 'a) Halle una expresión desarrollada y simplificada para el discriminante $\\Delta$ de la parábola en términos de $k$.',
+            marks: 3,
+            inputs: [
+              {
+                id: '12a_delta',
+                label: 'Discriminante Δ(k) =',
+                type: 'expanded_poly',
+                vars: ['k'],
+                targetExpr: 'k^2 + 2*k + 9',
+                testPoints: [-3, -1, 0, 2, 4],
+                placeholder: 'ej. k^2 + 4k + 5'
+              }
+            ]
+          },
+          {
+            label: 'b) Escriba la expresión obtenida para $\\Delta$ en la forma $(k + p)^2 + q$, donde $p, q \\in \\mathbb{Z}$.',
+            marks: 2,
+            inputs: [
+              { id: '12b_p', label: 'Valor de p =', type: 'number', expected: 1, tol: 0.001, placeholder: 'ej. -2' },
+              { id: '12b_q', label: 'Valor mínimo de Δ (q) =', type: 'number', expected: 8, tol: 0.001, placeholder: 'ej. 12' }
+            ]
+          },
+          {
+            label: 'c) A partir del resultado anterior, deduzca el número de intersecciones que tiene cualquier parábola de esta familia con el eje $x$ y concluya si existe algún valor real de $k$ para el cual el eje $x$ sea tangente a la parábola.',
+            marks: 3,
+            inputs: [
+              { id: '12c_cuts', label: 'N.º de cortes con el eje x =', type: 'number', expected: 2, tol: 0.001, placeholder: 'ej. 1' },
+              {
+                id: '12c_tan',
+                label: '¿Existe k ∈ ℝ de tangencia?',
+                type: 'select',
+                expected: 'no',
+                options: [
+                  { value: '', label: 'Selecciona una conclusión...' },
+                  { value: 'si', label: 'Sí, existe un valor real de k donde Δ = 0' },
+                  { value: 'no', label: 'No existe ningún k ∈ ℝ, porque Δ ≥ 8 > 0 para todo k' }
+                ]
+              }
+            ]
+          }
+        ],
+        hints: [
+          'Identifica $a = k$, $b = k + 3$ y $c = 1$. Expande $\\Delta = (k + 3)^2 - 4(k)(1)$ reduciendo términos semejantes.',
+          'Completa el cuadrado en $k^2 + 2k + 9 = (k + 1)^2 + 8$. Como $(k + 1)^2 \\ge 0$ para todo $k \\in \\mathbb{R}$, el discriminante siempre es estrictamente positivo ($\\Delta \\ge 8 > 0$).'
+        ],
+        solution: `
+          <p><strong>a) [3 puntos]</strong> Aplicando $\\Delta = b^2 - 4ac$ con $a = k$, $b = k + 3$ y $c = 1$:</p>
+          <p>$\\Delta = (k + 3)^2 - 4(k)(1)$ <strong>[M1]</strong></p>
+          <p>$\\Delta = k^2 + 6k + 9 - 4k = k^2 + 2k + 9$ <strong>[M1][A1]</strong>.</p>
+          <p class="mt-2"><strong>b) [2 puntos]</strong> Completando el cuadrado:</p>
+          <p>$\\Delta = (k^2 + 2k + 1) + 8 = (k + 1)^2 + 8$ <strong>[M1][A1]</strong>, de donde $p = 1$ y $q = 8$.</p>
+          <p class="mt-2"><strong>c) [3 puntos]</strong> Como $(k + 1)^2 \\ge 0$ para todo $k \\in \\mathbb{R}$, se cumple $\\Delta \\ge 8 > 0$ <strong>[R1]</strong>.</p>
+          <p>Por tanto, la parábola siempre tiene <strong>$2$ intersecciones</strong> reales distintas con el eje $x$ <strong>[A1]</strong> y <strong>no existe ningún valor real de $k$</strong> para el cual el eje $x$ sea tangente (pues nunca ocurre $\\Delta = 0$) <strong>[R1]</strong>.</p>
+        `
+      }
+    ];
+
+    let PROBLEMS = JSON.parse(JSON.stringify(BASE_PROBLEMS));
+
+    // =========================================================================
+    // BANCO DE SPRINT DE FÓRMULAS (60 SEGUNDOS)
+    // =========================================================================
+    const SPRINT_QUESTIONS = [
+      { prompt: 'Hallar el término general $u_n$ o la suma $S_n$ de una sucesión con diferencia constante $d$.', code: '1.2', options: ['1.2', '1.3', '1.4', '1.9'] },
+      { prompt: 'Calcular el valor futuro $FV$ de una inversión con capitalización mensual o semestral.', code: '1.4', options: ['1.2', '1.4', '2.6', '4.2'] },
+      { prompt: 'Determinar el coeficiente de $x^r$ en la expansión de $(a + bx)^n$.', code: '1.9', options: ['1.3', '1.9', '2.7', '3.5'] },
+      { prompt: 'Verificar que dos rectas son perpendiculares mediante $m_1 m_2 = -1$.', code: '2.1', options: ['2.1', '2.6', '3.2', '4.5'] },
+      { prompt: 'Hallar el eje de simetría $x = -\\frac{b}{2a}$ del vértice de una parábola.', code: '2.6', options: ['1.9', '2.1', '2.6', '3.6'] },
+      { prompt: 'Analizar el número de raíces reales de $ax^2 + bx + c = 0$ usando $\\Delta = b^2 - 4ac$.', code: '2.7', options: ['2.1', '2.7', '3.2', '4.6'] },
+      { prompt: 'Calcular el lado opuesto dados dos lados y el ángulo comprendido entre ellos.', code: '3.2', options: ['3.2', '3.5', '3.6', '4.3'] },
+      { prompt: 'Simplificar una expresión sustituyendo $\\cos^2\\theta + \\operatorname{sen}^2\\theta = 1$.', code: '3.5', options: ['2.7', '3.2', '3.5', '3.6'] },
+      { prompt: 'Reescribir $\\cos(2x)$ en términos de $\\operatorname{sen}^2 x$ para resolver una ecuación trigonométrica.', code: '3.6', options: ['3.2', '3.5', '3.6', '4.6'] },
+      { prompt: 'Determinar formalmente si una observación supera la frontera $Q_3 + 1,5\\,\\text{RIC}$.', code: '4.3', options: ['1.4', '4.2', '4.3', '4.5'] },
+      { prompt: 'Calcular $P(A \\cup B)$ cuando los sucesos $A$ y $B$ no son mutuamente excluyentes.', code: '4.5', options: ['4.2', '4.3', '4.5', '4.6'] },
+      { prompt: 'Calcular $P(A \\mid B)$ conociendo $P(A \\cap B)$ y $P(B)$.', code: '4.6', options: ['3.6', '4.3', '4.5', '4.6'] }
+    ];
+
+    // =========================================================================
+    // CASOS DE CAZA DE ERRORES TÍPICOS IB
+    // =========================================================================
+    const ERROR_CASES = [
+      {
+        title: 'Caso 1 (Subtema 3.6): Ecuación $\\operatorname{sen} x = \\frac{1}{2}$ en $[0, 2\\pi]$',
+        work: 'Alumno escribe: «Como $\\operatorname{sen} x = \\frac{1}{2}$, entonces $x = \\frac{\\pi}{6}$ y $x = 2\\pi - \\frac{\\pi}{6} = \\frac{11\\pi}{6}$.»',
+        options: [
+          'Calculó mal el ángulo de referencia de $\\operatorname{sen}^{-1}(0,5)$.',
+          'Tomó el cuarto cuadrante ($2\\pi - \\frac{\\pi}{6}$) donde el seno es negativo, en lugar del segundo cuadrante ($\\pi - \\frac{\\pi}{6} = \\frac{5\\pi}{6}$).',
+          'Debió convertir $\\frac{\\pi}{6}$ a grados sexagesimales.'
+        ],
+        correct: 1,
+        explanation: 'En el intervalo $[0, 2\\pi]$, $\\operatorname{sen} x > 0$ en el 1.er y 2.º cuadrante ($x = \\frac{\\pi}{6}$ y $x = \\pi - \\frac{\\pi}{6} = \\frac{5\\pi}{6}$). En $\\frac{11\\pi}{6}$ el seno vale $-\\frac{1}{2}$.'
+      },
+      {
+        title: 'Caso 2 (Subtema 2.2): Función inversa de $f(x) = \\frac{2x+1}{x-3}$',
+        work: 'Alumno escribe: «$f^{-1}(x) = \\frac{3x+1}{x-2}$, con dominio $x \\neq 3$ igual que la función original.»',
+        options: [
+          'Despejó mal el numerador de $f^{-1}(x)$.',
+          'El dominio de $f^{-1}$ es el recorrido de $f$, por lo que la restricción es $x \\neq 2$ (asíntota horizontal de $f$), no $x \\neq 3$.',
+          'Una función racional no tiene inversa.'
+        ],
+        correct: 1,
+        explanation: 'Al invertir $f$, su dominio ($x \\neq 3$) pasa a ser el recorrido de $f^{-1}$, mientras que su recorrido ($y \\neq 2$) se convierte en el dominio de $f^{-1}$ ($x \\neq 2$).'
+      },
+      {
+        title: 'Caso 3 (Subtema 3.2): Área constante en triángulo $OAB$',
+        work: 'Alumno escribe: «Si el ángulo entre lados de $18\\text{ km}$ y $24\\text{ km}$ es $75^\\circ$, el otro ángulo que da la misma área es $360^\\circ - 75^\\circ = 285^\\circ$.»',
+        options: [
+          'Un ángulo interior de un triángulo debe cumplir $0^\\circ < \\theta < 180^\\circ$, por lo que el ángulo obtuso suplementario es $180^\\circ - 75^\\circ = 105^\\circ$.',
+          'El área cambia si se modifica el ángulo.',
+          'Debió usar el teorema del coseno en lugar del seno.'
+        ],
+        correct: 0,
+        explanation: 'En un triángulo, todo ángulo interior está entre $0^\\circ$ y $180^\\circ$. La identidad $\\operatorname{sen}(180^\\circ - \\theta) = \\operatorname{sen}\\theta$ produce el ángulo obtuso $105^\\circ$.'
+      },
+      {
+        title: 'Caso 4 (Subtema 4.3): Detección de valores atípicos',
+        work: 'Alumno escribe: «Como $46$ se ve mucho mayor que los demás datos, concluyo directamente que es un valor atípico sin calcular $Q_3 + 1,5\\,\\text{RIC}$.»',
+        options: [
+          'En el PD IB es obligatorio calcular explícitamente la frontera $Q_3 + 1,5\\,\\text{RIC}$ y comparar numéricamente el dato contra ese umbral.',
+          'Los valores atípicos solo existen si $n > 30$.',
+          'La frontera superior se calcula con la media más dos desviaciones estándar.'
+        ],
+        correct: 0,
+        explanation: 'El esquema de calificación IB exige siempre mostrar el cálculo numérico de $Q_3 + 1,5\\,\\text{RIC}$ [M1] y la comparación explícita [R1] para otorgar los puntos.'
+      },
+      {
+        title: 'Caso 5 (Subtema 4.4): Uso de la recta de regresión $y$ sobre $x$',
+        work: 'Alumno escribe: «La recta de consumo ($y$) sobre temperatura ($x$) es $y = 3,4x + 18,5$. Para predecir $x$ cuando $y = 150$, sustituyo $150 = 3,4x + 18,5$ y despejo $x$.»',
+        options: [
+          'Comete dos errores graves: usar la recta de $y$ sobre $x$ para predecir $x$, y extrapolar fuera del rango observado de datos.',
+          'Solo debe cambiar $3,4$ por $-3,4$.',
+          'La recta de regresión no pasa por $(\\bar{x}, \\bar{y})$.'
+        ],
+        correct: 0,
+        explanation: 'En MAE NM se penaliza tanto invertir la recta de regresión de $y$ sobre $x$ para estimar $x$ como extrapolar valores muy alejados del rango muestral.'
+      }
+    ];
+
+    // =========================================================================
+    // ESTADO GLOBAL Y PERSISTENCIA
+    // =========================================================================
+    const STORAGE_KEY = 'vcsp_mae_nm_mock_2026_v4';
+    let state = {
+      activeProblemId: 1,
+      topicFilter: 'all',
+      calcFilter: 'all',
+      mode: 'free',
+      completedIds: [],
+      userAnswers: {},
+      scratchpads: {},
+      hintsRevealed: {},
+      solutionsRevealed: {},
+      streak: 0,
+      sprintBest: 0,
+      errorHuntSolved: [],
+      studentName: '',
+      studentSection: ''
+    };
+
+    let activeInputId = null;
+    let timerInterval = null;
+    let timerSecondsLeft = 0;
+    let timerPaused = false;
+    let sprintInterval = null;
+    let sprintTimeLeft = 60;
+    let sprintScore = 0;
+    let sprintCurrentQ = null;
+    let resetConfirmPending = false;
+    let resetConfirmTimer = null;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state = { ...state, ...parsed };
+        }
+      } catch (e) {
+        // Ignorar si localStorage está bloqueado en entorno aislado
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        // Ignorar si localStorage está bloqueado
+      }
+    }
+
+    // =========================================================================
+    // EVALUADOR MATEMÁTICO SEGURO (SIN Function() NI eval())
+    // =========================================================================
+    function normalizeMathString(str) {
+      return String(str || '')
+        .trim()
+        .replace(/,/g, '.')
+        .replace(/−/g, '-')
+        .replace(/×/g, '*')
+        .replace(/÷/g, '/')
+        .replace(/²/g, '^2')
+        .replace(/³/g, '^3')
+        .replace(/π/g, 'pi')
+        .replace(/√\s*\(/g, 'sqrt(')
+        .replace(/√\s*([0-9.]+|[a-zA-Zα])/g, 'sqrt($1)')
+        .replace(/\bsen\b/gi, 'sin')
+        .replace(/\b(sin|cos|tan)\^(\d+)\s*\(([^()]+)\)/gi, '($1($3))^$2')
+        .replace(/\b(sin|cos|tan)\^(\d+)\s*([a-zA-Zα])/gi, '($1($3))^$2');
+    }
+
+    function tokenizeMath(expr) {
+      const s = normalizeMathString(expr).replace(/\s+/g, '');
+      const tokens = [];
+      let i = 0;
+      while (i < s.length) {
+        const ch = s[i];
+        if (/[0-9.]/.test(ch)) {
+          let num = '';
+          while (i < s.length && /[0-9.]/.test(s[i])) {
+            num += s[i++];
+          }
+          if (num.split('.').length > 2) return null;
+          tokens.push({ type: 'num', value: parseFloat(num) });
+          continue;
+        }
+        if (/[a-zA-Zα]/.test(ch)) {
+          let word = '';
+          while (i < s.length && /[a-zA-Zα]/.test(s[i])) {
+            word += s[i++];
+          }
+          const lower = word.toLowerCase();
+          if (lower === 'pi') {
+            tokens.push({ type: 'num', value: Math.PI });
+          } else if (lower === 'e') {
+            tokens.push({ type: 'num', value: Math.E });
+          } else if (['sin', 'cos', 'tan', 'sqrt'].includes(lower)) {
+            tokens.push({ type: 'func', value: lower });
+          } else if (word.length === 1) {
+            tokens.push({ type: 'var', value: word });
+          } else {
+            // Multiplicación implícita de variables de 1 letra como "na" -> "n", "*", "a"
+            for (let k = 0; k < word.length; k++) {
+              if (k > 0) tokens.push({ type: 'op', value: '*' });
+              tokens.push({ type: 'var', value: word[k] });
+            }
+          }
+          continue;
+        }
+        if ('+-*/^()'.includes(ch)) {
+          if (ch === '(' || ch === ')') {
+            tokens.push({ type: 'paren', value: ch });
+          } else {
+            tokens.push({ type: 'op', value: ch });
+          }
+          i++;
+          continue;
+        }
+        return null;
+      }
+
+      // Insertar multiplicación implícita y manejar menos unario
+      const out = [];
+      for (let j = 0; j < tokens.length; j++) {
+        const cur = tokens[j];
+        const prev = out[out.length - 1];
+
+        if (prev) {
+          const prevIsVal = prev.type === 'num' || prev.type === 'var' || (prev.type === 'paren' && prev.value === ')');
+          const curIsVal = cur.type === 'num' || cur.type === 'var' || cur.type === 'func' || (cur.type === 'paren' && cur.value === '(');
+          if (prevIsVal && curIsVal) {
+            out.push({ type: 'op', value: '*' });
+          }
+        }
+
+        if (cur.type === 'op' && (cur.value === '-' || cur.value === '+')) {
+          const isUnary = !prev || prev.type === 'op' || (prev.type === 'paren' && prev.value === '(');
+          if (isUnary) {
+            if (cur.value === '-') {
+              out.push({ type: 'op', value: 'u-' });
+            }
+            continue;
+          }
+        }
+        out.push(cur);
+      }
+      return out;
+    }
+
+    function evalTokensWithVars(tokens, varMap = {}) {
+      if (!tokens || !tokens.length) return NaN;
+      const prec = { '+': 1, '-': 1, '*': 2, '/': 2, 'u-': 3, '^': 4 };
+      const rightAssoc = { '^': true, 'u-': true };
+      const rpn = [];
+      const ops = [];
+
+      for (const tok of tokens) {
+        if (tok.type === 'num' || tok.type === 'var') {
+          rpn.push(tok);
+        } else if (tok.type === 'func') {
+          ops.push(tok);
+        } else if (tok.type === 'op') {
+          while (ops.length) {
+            const top = ops[ops.length - 1];
+            if (top.type === 'func') {
+              rpn.push(ops.pop());
+            } else if (
+              top.type === 'op' &&
+              ((!rightAssoc[tok.value] && prec[tok.value] <= prec[top.value]) ||
+               (rightAssoc[tok.value] && prec[tok.value] < prec[top.value]))
+            ) {
+              rpn.push(ops.pop());
+            } else {
+              break;
+            }
+          }
+          ops.push(tok);
+        } else if (tok.type === 'paren' && tok.value === '(') {
+          ops.push(tok);
+        } else if (tok.type === 'paren' && tok.value === ')') {
+          while (ops.length && !(ops[ops.length - 1].type === 'paren' && ops[ops.length - 1].value === '(')) {
+            rpn.push(ops.pop());
+          }
+          if (!ops.length) return NaN;
+          ops.pop();
+          if (ops.length && ops[ops.length - 1].type === 'func') {
+            rpn.push(ops.pop());
+          }
+        }
+      }
+      while (ops.length) {
+        const top = ops.pop();
+        if (top.type === 'paren') return NaN;
+        rpn.push(top);
+      }
+
+      const stack = [];
+      for (const item of rpn) {
+        if (item.type === 'num') {
+          stack.push(item.value);
+        } else if (item.type === 'var') {
+          if (!(item.value in varMap)) return NaN;
+          stack.push(varMap[item.value]);
+        } else if (item.type === 'func') {
+          if (stack.length < 1) return NaN;
+          const a = stack.pop();
+          if (item.value === 'sin') stack.push(Math.sin(a));
+          else if (item.value === 'cos') stack.push(Math.cos(a));
+          else if (item.value === 'tan') stack.push(Math.tan(a));
+          else if (item.value === 'sqrt') {
+            if (a < 0) return NaN;
+            stack.push(Math.sqrt(a));
+          }
+        } else if (item.type === 'op') {
+          if (item.value === 'u-') {
+            if (stack.length < 1) return NaN;
+            stack.push(-stack.pop());
+          } else {
+            if (stack.length < 2) return NaN;
+            const b = stack.pop();
+            const a = stack.pop();
+            if (item.value === '+') stack.push(a + b);
+            else if (item.value === '-') stack.push(a - b);
+            else if (item.value === '*') stack.push(a * b);
+            else if (item.value === '/') {
+              if (Math.abs(b) < 1e-12) return NaN;
+              stack.push(a / b);
+            } else if (item.value === '^') {
+              stack.push(Math.pow(a, b));
+            }
+          }
+        }
+      }
+      return stack.length === 1 && Number.isFinite(stack[0]) ? stack[0] : NaN;
+    }
+
+    function parseMathInput(raw) {
+      const tokens = tokenizeMath(raw);
+      return evalTokensWithVars(tokens, {});
+    }
+
+    function checkAlgebraicEquivalence(userRaw, targetRaw, vars, customPoints) {
+      const uTokens = tokenizeMath(userRaw);
+      const tTokens = tokenizeMath(targetRaw);
+      if (!uTokens || !tTokens) return false;
+
+      const pts = customPoints || [1.3, 2.7, 4.1, 5.5, 7.2];
+      let validCount = 0;
+      for (let idx = 0; idx < pts.length; idx++) {
+        const env = {};
+        vars.forEach((v, vIdx) => {
+          env[v] = pts[(idx + vIdx) % pts.length] + vIdx * 0.6;
+        });
+        const uVal = evalTokensWithVars(uTokens, env);
+        const tVal = evalTokensWithVars(tTokens, env);
+        if (!Number.isFinite(uVal) || !Number.isFinite(tVal)) continue;
+        validCount++;
+        if (Math.abs(uVal - tVal) > 1e-4) return false;
+      }
+      return validCount >= 3;
+    }
+
+    function checkEquationEquivalence(userRaw, lhsTarget, rhsTarget, vars) {
+      const cleaned = String(userRaw || '').trim();
+      const parts = cleaned.split('=');
+      if (parts.length !== 2) return false;
+      const uDiff = `(${parts[0]}) - (${parts[1]})`;
+      const tDiff = `(${lhsTarget}) - (${rhsTarget})`;
+
+      const uTokens = tokenizeMath(uDiff);
+      const tTokens = tokenizeMath(tDiff);
+      if (!uTokens || !tTokens) return false;
+
+      // Verificar si uDiff / tDiff es constante no nula en varios puntos de prueba
+      const samples = [
+        { [vars[0]]: 3, [vars[1] || 'y']: 4 },
+        { [vars[0]]: 5, [vars[1] || 'y']: 2 },
+        { [vars[0]]: 7, [vars[1] || 'y']: 6 },
+        { [vars[0]]: 8, [vars[1] || 'y']: 3 }
+      ];
+      let ratio = null;
+      for (const env of samples) {
+        const uv = evalTokensWithVars(uTokens, env);
+        const tv = evalTokensWithVars(tTokens, env);
+        if (!Number.isFinite(uv) || !Number.isFinite(tv) || Math.abs(tv) < 1e-6) continue;
+        const r = uv / tv;
+        if (Math.abs(r) < 1e-6) return false;
+        if (ratio === null) ratio = r;
+        else if (Math.abs(r - ratio) > 1e-4) return false;
+      }
+      return ratio !== null;
+    }
+
+    // =========================================================================
+    // RENDERIZADO DE FÓRMULAS KATEX
+    // =========================================================================
+    function renderMathIn(el) {
+      if (!el) return;
+      if (typeof renderMathInElement === 'function') {
+        try {
+          renderMathInElement(el, {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$', right: '$', display: false }
+            ],
+            throwOnError: false
+          });
+        } catch (e) {}
+      } else {
+        setTimeout(() => renderMathIn(el), 120);
+      }
+    }
+
+    // =========================================================================
+    // NAVEGACIÓN, FILTROS Y RENDERIZADO DE INTERFAZ
+    // =========================================================================
+    function getFilteredProblems() {
+      return PROBLEMS.filter(p => {
+        const topicOk = state.topicFilter === 'all' || p.topic === state.topicFilter;
+        const calcOk = state.calcFilter === 'all' || p.calc === state.calcFilter;
+        return topicOk && calcOk;
+      });
+    }
+
+    function renderHeaderStats() {
+      const earnedPts = PROBLEMS.filter(p => state.completedIds.includes(p.id)).reduce((s, p) => s + p.points, 0);
+      const totalPts = PROBLEMS.reduce((s, p) => s + p.points, 0);
+      const pct = totalPts > 0 ? Math.round((earnedPts / totalPts) * 100) : 0;
+
+      const progText = document.getElementById('global-progress-text');
+      const progBar = document.getElementById('global-progress-bar');
+      const streakEl = document.getElementById('streak-counter');
+      const badgesEl = document.getElementById('topic-badges-container');
+
+      if (progText) progText.textContent = `${state.completedIds.length}/${PROBLEMS.length} (${earnedPts}/${totalPts} pts)`;
+      if (progBar) progBar.style.width = `${pct}%`;
+      if (streakEl) streakEl.textContent = String(state.streak);
+
+      if (badgesEl) {
+        const topics = [
+          { id: '1', label: 'T1' },
+          { id: '2', label: 'T2' },
+          { id: '3', label: 'T3' },
+          { id: '4', label: 'T4' }
+        ];
+        badgesEl.innerHTML = topics.map(t => {
+          const tProbs = PROBLEMS.filter(p => p.topic === t.id);
+          const allDone = tProbs.length > 0 && tProbs.every(p => state.completedIds.includes(p.id));
+          return `
+            <span title="${allDone ? 'Unidad dominada' : 'Unidad en progreso'}" class="px-2 py-0.5 rounded-lg text-[10px] font-extrabold border ${
+              allDone
+                ? 'bg-emerald-400/25 border-emerald-300/60 text-emerald-100'
+                : 'bg-white/5 border-white/15 text-sky-200/60'
+            }">
+              ${allDone ? '🏅' : '○'} ${t.label}
+            </span>
+          `;
+        }).join('');
+      }
+    }
+
+    function renderProblemList() {
+      const filtered = getFilteredProblems();
+      const listEl = document.getElementById('problem-list');
+      const countEl = document.getElementById('filtered-count-label');
+      const posEl = document.getElementById('nav-position-label');
+      const prevBtn = document.getElementById('btn-prev-problem');
+      const nextBtn = document.getElementById('btn-next-problem');
+
+      if (countEl) countEl.textContent = `Mostrando ${filtered.length}`;
+      if (!listEl) return;
+
+      if (!filtered.length) {
+        listEl.innerHTML = `<div class="col-span-full text-center text-xs text-slate-400 py-4">No hay problemas con ese filtro.</div>`;
+        return;
+      }
+
+      if (!filtered.some(p => p.id === state.activeProblemId)) {
+        state.activeProblemId = filtered[0].id;
+      }
+
+      const activeIdx = filtered.findIndex(p => p.id === state.activeProblemId);
+      if (posEl) posEl.textContent = `Problema ${activeIdx + 1} de ${filtered.length}`;
+      if (prevBtn) prevBtn.disabled = activeIdx <= 0;
+      if (nextBtn) nextBtn.disabled = activeIdx >= filtered.length - 1;
+
+      listEl.innerHTML = filtered.map(p => {
+        const isCurrent = p.id === state.activeProblemId;
+        const isDone = state.completedIds.includes(p.id);
+        return `
+          <button
+            onclick="selectProblem(${p.id})"
+            class="p-2.5 rounded-xl border text-left transition flex flex-col justify-between ${
+              isCurrent
+                ? 'bg-vcsp-navy text-white border-vcsp-navy shadow-xs'
+                : isDone
+                  ? 'bg-emerald-50/80 text-emerald-950 border-emerald-300 hover:bg-emerald-100/70'
+                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+            }"
+          >
+            <div class="flex items-center justify-between w-full">
+              <span class="text-xs font-extrabold">#${p.id}</span>
+              <span class="text-[10px] font-bold">${isDone ? '✅' : p.calc === 'gdc' ? '📱' : '🚫'}</span>
+            </div>
+            <div class="mt-1 flex items-center justify-between w-full text-[10px] ${isCurrent ? 'text-sky-200' : 'text-slate-500'}">
+              <span>T${p.topic}</span>
+              <span class="font-bold">${p.points} pts</span>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderActiveProblem() {
+      const prob = PROBLEMS.find(p => p.id === state.activeProblemId) || PROBLEMS[0];
+      const workspace = document.getElementById('problem-workspace');
+      if (!workspace || !prob) return;
+
+      const isDone = state.completedIds.includes(prob.id);
+      const revealedHints = state.hintsRevealed[prob.id] || 0;
+      const solRevealed = !!state.solutionsRevealed[prob.id];
+      const scratchText = (state.scratchpads[prob.id] || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      const calcBadge = prob.calc === 'gdc'
+        ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-100 text-sky-900 border border-sky-200">📱 Con Calculadora GDC (P2)</span>`
+        : `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-900 border border-rose-200">🚫 Sin Calculadora (P1)</span>`;
+
+      const variantBtn = prob.hasVariants
+        ? `<button onclick="generateVariant(${prob.id})" class="px-3 py-1 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-xs font-bold text-slate-700 transition">🎲 Otra variante</button>`
+        : '';
+
+      const partsHtml = prob.parts.map((part, pIdx) => {
+        const inputsHtml = part.inputs.map(inp => {
+          const savedVal = (state.userAnswers[inp.id] || '').replace(/"/g, '&quot;');
+          if (inp.type === 'select') {
+            const optsHtml = inp.options.map(o => `<option value="${o.value}" ${savedVal === o.value ? 'selected' : ''}>${o.label}</option>`).join('');
+            return `
+              <div class="space-y-1">
+                <label for="input_${inp.id}" class="block text-xs font-bold text-slate-700">${inp.label}</label>
+                <select
+                  id="input_${inp.id}"
+                  onchange="state.userAnswers['${inp.id}']=this.value; saveState()"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-vcsp-navy/30"
+                >
+                  ${optsHtml}
+                </select>
+                <div id="fb_${inp.id}" class="text-[11px] font-semibold min-h-[16px]"></div>
+              </div>
+            `;
+          }
+          return `
+            <div class="space-y-1">
+              <label for="input_${inp.id}" class="block text-xs font-bold text-slate-700">${inp.label}</label>
+              <input
+                id="input_${inp.id}"
+                type="text"
+                value="${savedVal}"
+                onfocus="activeInputId='input_${inp.id}'"
+                oninput="state.userAnswers['${inp.id}']=this.value; saveState()"
+                placeholder="${inp.placeholder || ''}"
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white font-mono text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-vcsp-navy/30"
+              />
+              <div id="fb_${inp.id}" class="text-[11px] font-semibold min-h-[16px]"></div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="p-4 rounded-2xl bg-slate-50/70 border border-slate-200 space-y-3">
+            <div class="flex items-start justify-between gap-3">
+              <div class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">${part.label}</div>
+              <span class="shrink-0 text-[11px] font-extrabold text-slate-500 bg-white px-2 py-0.5 rounded-lg border border-slate-200">[${part.marks} pts]</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-${Math.min(part.inputs.length, 3)} gap-3">
+              ${inputsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const gdcSection = prob.gdcGuide ? `
+        <details class="rounded-2xl border border-sky-200 bg-sky-50/60 overflow-hidden">
+          <summary class="px-4 py-2.5 text-xs font-extrabold text-sky-900 cursor-pointer select-none flex items-center justify-between">
+            <span>📱 Guía de Comandos GDC (TI-84 Plus CE / Casio fx-CG50)</span>
+            <span class="text-[11px] underline">Desplegar pasos</span>
+          </summary>
+          <div class="px-4 pb-3 pt-1 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs border-t border-sky-200/70">
+            <div class="p-3 rounded-xl bg-white border border-sky-200">
+              <div class="font-extrabold text-sky-950 mb-1">Texas Instruments TI-84 Plus CE</div>
+              <p class="text-slate-600 leading-relaxed">${prob.gdcGuide.ti84}</p>
+            </div>
+            <div class="p-3 rounded-xl bg-white border border-sky-200">
+              <div class="font-extrabold text-sky-950 mb-1">Casio fx-CG50</div>
+              <p class="text-slate-600 leading-relaxed">${prob.gdcGuide.casio}</p>
+            </div>
+          </div>
+        </details>
+      ` : '';
+
+      const hintsHtml = revealedHints > 0 ? `
+        <div class="space-y-2">
+          ${prob.hints.slice(0, revealedHints).map((h, i) => `
+            <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 leading-relaxed animate-fade">
+              <strong>💡 Pista ${i + 1}:</strong> ${h}
+            </div>
+          `).join('')}
+        </div>
+      ` : '';
+
+      const solutionHtml = solRevealed ? `
+        <div class="p-4 sm:p-5 rounded-2xl bg-emerald-50/70 border border-emerald-300 space-y-3 text-xs sm:text-sm text-slate-800 animate-fade">
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-emerald-200">
+            <span class="font-extrabold text-emerald-950">📋 Esquema de Calificación Modelo PD IB ([M1], [A1], [R1])</span>
+            ${!isDone ? `<button onclick="markSelfVerified(${prob.id})" class="px-3 py-1 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition">✓ Mi procedimiento coincide (${prob.points} pts)</button>` : `<span class="text-xs font-extrabold text-emerald-800">✅ Problema acreditado</span>`}
+          </div>
+          <div class="space-y-1.5 leading-relaxed">${prob.solution}</div>
+          ${prob.tokNote ? `
+            <div class="mt-3 p-3 rounded-xl bg-white border border-emerald-200 text-xs text-slate-700">
+              <strong class="text-vcsp-navy">🌐 Conexión TdC (Teoría del Conocimiento):</strong> ${prob.tokNote}
+            </div>
+          ` : ''}
+        </div>
+      ` : '';
+
+      workspace.innerHTML = `
+        <!-- Cabecera del Problema -->
+        <div class="p-5 sm:p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex flex-wrap items-center gap-2 mb-1">
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-vcsp-navy">${prob.subtopic}</span>
+              ${calcBadge}
+              ${isDone ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300">✅ Dominado</span>` : ''}
+            </div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">Problema ${prob.id}: ${prob.title}</h2>
+          </div>
+          <div class="flex items-center gap-2 self-start sm:self-center">
+            ${variantBtn}
+            <span class="px-3 py-1.5 rounded-xl bg-vcsp-navy text-white text-xs font-extrabold shadow-2xs">[${prob.points} puntos]</span>
+          </div>
+        </div>
+
+        <!-- Cuerpo del Problema -->
+        <div class="p-5 sm:p-6 space-y-5">
+          <!-- Enunciado Principal -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-sm sm:text-base text-slate-800 leading-relaxed">
+            ${prob.statement}
+          </div>
+
+          <!-- Teclado Rápido Matemático -->
+          <div class="px-4 py-2.5 rounded-2xl bg-white border border-slate-200 flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs font-bold text-slate-500 flex items-center gap-1.5">⌨️ Teclado rápido para respuestas:</span>
+            <div class="flex flex-wrap gap-1.5">
+              ${[
+                { label: 'π', ins: 'π' },
+                { label: '√( )', ins: '√()' },
+                { label: 'a/b', ins: '/' },
+                { label: '−', ins: '-' },
+                { label: 'xⁿ', ins: '^' },
+                { label: '( )', ins: '()' },
+                { label: 'x', ins: 'x' },
+                { label: 'k', ins: 'k' },
+                { label: 'α', ins: 'α' },
+                { label: 'sen', ins: 'sen()' },
+                { label: 'cos', ins: 'cos()' }
+              ].map(btn => `
+                <button
+                  type="button"
+                  onclick="insertSymbol('${btn.ins}')"
+                  class="px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-vcsp-navy hover:text-white border border-slate-300 font-serif text-xs font-bold text-slate-700 transition"
+                >
+                  ${btn.label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Subapartados -->
+          <div class="space-y-3">
+            ${partsHtml}
+          </div>
+
+          <!-- Guía GDC si aplica -->
+          ${gdcSection}
+
+          <!-- Espacio de Procedimiento / Scratchpad -->
+          <details class="rounded-2xl border border-slate-200 bg-slate-50/50 overflow-hidden">
+            <summary class="px-4 py-2.5 text-xs font-extrabold text-slate-700 cursor-pointer select-none flex items-center justify-between">
+              <span>✍️ Espacio de Procedimiento / Borrador Paso a Paso ([M1])</span>
+              <span class="text-[11px] text-slate-400">Se guarda automáticamente</span>
+            </summary>
+            <div class="p-3 pt-1 border-t border-slate-200/70">
+              <textarea
+                rows="3"
+                oninput="state.scratchpads[${prob.id}]=this.value; saveState()"
+                placeholder="Escribe aquí tu planteamiento, ecuaciones intermedias y justificación antes de verificar..."
+                class="w-full p-3 rounded-xl border border-slate-300 bg-white font-mono text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-vcsp-navy/30"
+              >${scratchText}</textarea>
+            </div>
+          </details>
+
+          <!-- Botonera de Acción -->
+          <div class="flex flex-wrap items-center gap-2.5 pt-1">
+            <button onclick="checkProblemAnswers(${prob.id})" class="px-5 py-2.5 rounded-xl bg-vcsp-navy hover:bg-vcsp-navyLight text-white text-xs sm:text-sm font-extrabold shadow transition flex items-center gap-1.5">
+              <span>✓</span> Verificar Respuestas
+            </button>
+            <button onclick="revealNextHint(${prob.id})" class="px-4 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold transition flex items-center gap-1.5">
+              <span>💡</span> Pista (${revealedHints}/${prob.hints.length})
+            </button>
+            <button onclick="toggleSolution(${prob.id})" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-bold transition flex items-center gap-1.5">
+              <span>📋</span> ${solRevealed ? 'Ocultar Esquema IB' : 'Ver Esquema de Calificación IB'}
+            </button>
+          </div>
+
+          <!-- Pistas y Solución Modelo -->
+          ${hintsHtml}
+          ${solutionHtml}
+        </div>
+      `;
+
+      renderMathIn(workspace);
+    }
+
+    function selectProblem(id) {
+      state.activeProblemId = id;
+      saveState();
+      renderProblemList();
+      renderActiveProblem();
+      if (state.mode === 'timed') resetProblemTimer();
+    }
+
+    function navigateProblem(delta) {
+      const filtered = getFilteredProblems();
+      const idx = filtered.findIndex(p => p.id === state.activeProblemId);
+      const nextIdx = idx + delta;
+      if (nextIdx >= 0 && nextIdx < filtered.length) {
+        selectProblem(filtered[nextIdx].id);
+      }
+    }
+
+    function setTopicFilter(val) {
+      state.topicFilter = val;
+      saveState();
+      renderProblemList();
+      renderActiveProblem();
+    }
+
+    function setCalcFilter(val) {
+      state.calcFilter = val;
+      saveState();
+      renderProblemList();
+      renderActiveProblem();
+    }
+
+    function insertSymbol(sym) {
+      let target = activeInputId ? document.getElementById(activeInputId) : null;
+      if (!target) {
+        target = document.querySelector('#problem-workspace input[type="text"]');
+      }
+      if (!target) {
+        showToast('Haz clic primero en un campo de respuesta.', '⌨️');
+        return;
+      }
+      const start = target.selectionStart || target.value.length;
+      const end = target.selectionEnd || target.value.length;
+      target.value = target.value.slice(0, start) + sym + target.value.slice(end);
+      target.focus();
+      const cursorOffset = sym.endsWith('()') ? start + sym.length - 1 : start + sym.length;
+      target.setSelectionRange(cursorOffset, cursorOffset);
+      target.dispatchEvent(new Event('input'));
+    }
+
+    // =========================================================================
+    // VERIFICACIÓN AUTOMÁTICA DE RESPUESTAS Y VARIANTES
+    // =========================================================================
+    function checkProblemAnswers(probId) {
+      const prob = PROBLEMS.find(p => p.id === probId);
+      if (!prob) return;
+
+      let allValid = true;
+      let anyEmpty = false;
+
+      prob.parts.forEach(part => {
+        part.inputs.forEach(inp => {
+          const el = document.getElementById(`input_${inp.id}`);
+          const fb = document.getElementById(`fb_${inp.id}`);
+          const rawVal = el ? el.value.trim() : '';
+          state.userAnswers[inp.id] = rawVal;
+
+          if (!rawVal) {
+            anyEmpty = true;
+            allValid = false;
+            if (fb) {
+              fb.className = 'text-[11px] font-semibold text-amber-700';
+              fb.textContent = '⚠️ Completa este campo.';
+            }
+            return;
+          }
+
+          let isOk = false;
+          let customErr = null;
+
+          if (inp.type === 'select') {
+            isOk = rawVal === inp.expected;
+          } else if (inp.type === 'equation') {
+            isOk = checkEquationEquivalence(rawVal, inp.lhs, inp.rhs, inp.vars);
+          } else if (inp.type === 'algebraic') {
+            isOk = checkAlgebraicEquivalence(rawVal, inp.targetExpr, inp.vars, inp.testPoints);
+          } else if (inp.type === 'factored_trig') {
+            const equiv = checkAlgebraicEquivalence(rawVal, inp.targetExpr, inp.vars, [0.2, 0.5, 0.9, 1.3]);
+            const isFactored = rawVal.includes('(') && rawVal.includes(')');
+            isOk = equiv && isFactored;
+            if (equiv && !isFactored) {
+              customErr = '⚠️ La expresión es equivalente, pero falta escribirla en forma factorizada.';
+            }
+          } else if (inp.type === 'expanded_poly') {
+            const equiv = checkAlgebraicEquivalence(rawVal, inp.targetExpr, inp.vars, inp.testPoints);
+            const noParens = !rawVal.includes('(') && !rawVal.includes(')');
+            isOk = equiv && noParens;
+            if (equiv && !noParens) {
+              customErr = '⚠️ Desarrolla y simplifica los paréntesis completamente.';
+            }
+          } else {
+            const numVal = parseMathInput(rawVal);
+            if (Number.isFinite(numVal)) {
+              isOk = Math.abs(numVal - inp.expected) <= (inp.tol || 0.01);
+              if (!isOk && inp.diagRadVal && Math.abs(numVal - inp.diagRadVal) <= 0.3) {
+                customErr = `⚠️ ${inp.diagRadMsg}`;
+              }
+            }
+          }
+
+          if (isOk) {
+            if (el) {
+              el.classList.remove('border-slate-300', 'border-rose-400');
+              el.classList.add('border-emerald-500', 'bg-emerald-50/40');
+            }
+            if (fb) {
+              fb.className = 'text-[11px] font-bold text-emerald-700';
+              fb.textContent = '✓ Correcto';
+            }
+          } else {
+            allValid = false;
+            if (el) {
+              el.classList.remove('border-slate-300', 'border-emerald-500', 'bg-emerald-50/40');
+              el.classList.add('border-rose-400');
+            }
+            if (fb) {
+              fb.className = 'text-[11px] font-semibold text-rose-700';
+              fb.textContent = customErr || '✕ Revisa tus cálculos, notación o redondeo a 3 c.s.';
+            }
+          }
+        });
+      });
+
+      saveState();
+
+      if (allValid && !anyEmpty) {
+        if (!state.completedIds.includes(prob.id)) {
+          state.completedIds.push(prob.id);
+          state.streak += 1;
+        }
+        state.solutionsRevealed[prob.id] = true;
+        saveState();
+        renderHeaderStats();
+        renderProblemList();
+        renderActiveProblem();
+        showToast(`¡Excelente! Has completado el Problema ${prob.id} (+${prob.points} pts).`, '🎉');
+      } else {
+        state.streak = 0;
+        saveState();
+        renderHeaderStats();
+        showToast(anyEmpty ? 'Completa todos los campos antes de verificar.' : 'Hay respuestas por corregir. Revisa las indicaciones.', '🧐');
+      }
+    }
+
+    function revealNextHint(probId) {
+      const prob = PROBLEMS.find(p => p.id === probId);
+      if (!prob) return;
+      const cur = state.hintsRevealed[probId] || 0;
+      if (cur < prob.hints.length) {
+        state.hintsRevealed[probId] = cur + 1;
+        saveState();
+        renderActiveProblem();
+      } else {
+        showToast('Ya has desplegado todas las pistas de este ejercicio.', '💡');
+      }
+    }
+
+    function toggleSolution(probId) {
+      state.solutionsRevealed[probId] = !state.solutionsRevealed[probId];
+      saveState();
+      renderActiveProblem();
+    }
+
+    function markSelfVerified(probId) {
+      const prob = PROBLEMS.find(p => p.id === probId);
+      if (!prob) return;
+      if (!state.completedIds.includes(probId)) {
+        state.completedIds.push(probId);
+        state.streak += 1;
+        saveState();
+        renderHeaderStats();
+        renderProblemList();
+        renderActiveProblem();
+        showToast(`Problema ${probId} acreditado (+${prob.points} pts).`, '✅');
+      }
+    }
+
+    function generateVariant(probId) {
+      const idx = PROBLEMS.findIndex(p => p.id === probId);
+      if (idx < 0) return;
+      const prob = PROBLEMS[idx];
+      const nextVar = ((prob.variantIndex || 0) + 1) % 3;
+
+      if (probId === 1) {
+        const variants = [
+          {
+            stmt: 'Los tres primeros términos consecutivos de una progresión aritmética están dados por $2k - 1$, $3k + 2$ y $5k - 1$, donde $k \\in \\mathbb{R}$.',
+            bLabel: 'b) Determine cuántos términos ($n$) de esta progresión deben sumarse para obtener un total de $616$.',
+            k: 6, d: 9, n: 11,
+            sol: `
+              <p><strong>a) [3 puntos]</strong> $(3k + 2) - (2k - 1) = (5k - 1) - (3k + 2) \\Rightarrow k + 3 = 2k - 3 \\Rightarrow k = 6$ <strong>[M1][A1]</strong>. Luego $u_1 = 11$, $u_2 = 20 \\Rightarrow d = 9$ <strong>[A1]</strong>.</p>
+              <p class="mt-2"><strong>b) [4 puntos]</strong> $\\frac{n}{2}[2(11) + (n-1)(9)] = 616 \\Rightarrow (n - 11)(9n + 112) = 0 \\Rightarrow n = 11$ <strong>[M1][A1][M1][A1]</strong>.</p>
+            `
+          },
+          {
+            stmt: 'Los tres primeros términos consecutivos de una progresión aritmética están dados por $k + 2$, $2k + 3$ y $4k - 1$, donde $k \\in \\mathbb{R}$.',
+            bLabel: 'b) Determine cuántos términos ($n$) de esta progresión deben sumarse para obtener un total de $340$.',
+            k: 5, d: 6, n: 10,
+            sol: `
+              <p><strong>a) [3 puntos]</strong> $(2k + 3) - (k + 2) = (4k - 1) - (2k + 3) \\Rightarrow k + 1 = 2k - 4 \\Rightarrow k = 5$ <strong>[M1][A1]</strong>. Sustituyendo $k = 5$: $u_1 = 7$, $u_2 = 13 \\Rightarrow d = 6$ <strong>[A1]</strong>.</p>
+              <p class="mt-2"><strong>b) [4 puntos]</strong> $\\frac{n}{2}[2(7) + (n-1)(6)] = 340 \\Rightarrow 3n^2 + 4n - 340 = 0 \\Rightarrow (n - 10)(3n + 34) = 0 \\Rightarrow n = 10$ (comprobación: $S_{10} = 5[14 + 54] = 340$) <strong>[M1][A1][M1][A1]</strong>.</p>
+            `
+          },
+          {
+            stmt: 'Los tres primeros términos consecutivos de una progresión aritmética están dados por $2k + 1$, $4k - 2$ y $5k + 1$, donde $k \\in \\mathbb{R}$.',
+            bLabel: 'b) Determine cuántos términos ($n$) de esta progresión deben sumarse para obtener un total de $441$.',
+            k: 6, d: 9, n: 9,
+            sol: `
+              <p><strong>a) [3 puntos]</strong> $(4k - 2) - (2k + 1) = (5k + 1) - (4k - 2) \\Rightarrow 2k - 3 = k + 3 \\Rightarrow k = 6$ <strong>[M1][A1]</strong>. Sustituyendo $k = 6$: $u_1 = 13$, $u_2 = 22 \\Rightarrow d = 9$ <strong>[A1]</strong>.</p>
+              <p class="mt-2"><strong>b) [4 puntos]</strong> $\\frac{n}{2}[2(13) + (n-1)(9)] = 441 \\Rightarrow 9n^2 + 17n - 882 = 0 \\Rightarrow (n - 9)(9n + 98) = 0 \\Rightarrow n = 9$ (comprobación: $S_9 = \\frac{9}{2}[26 + 72] = 441$) <strong>[M1][A1][M1][A1]</strong>.</p>
+            `
+          }
+        ];
+
+        const v = variants[nextVar];
+        prob.variantIndex = nextVar;
+        prob.statement = v.stmt;
+        prob.parts[1].label = v.bLabel;
+        prob.parts[0].inputs[0].expected = v.k;
+        prob.parts[0].inputs[1].expected = v.d;
+        prob.parts[1].inputs[0].expected = v.n;
+        prob.solution = v.sol;
+        ['1a_k', '1a_d', '1b_n'].forEach(id => delete state.userAnswers[id]);
+      } else if (probId === 3) {
+        const variants = [
+          {
+            stmt: 'Una recta $L_1$ tiene ecuación $2x + 3y - 12 = 0$. Otra recta $L_2$ es perpendicular a $L_1$ y pasa por el punto medio del segmento que une $A(-2, 5)$ y $B(6, 1)$.',
+            bLabel: 'b) La función cuadrática $h(x) = 2x^2 - 8x + p$ no corta al eje $x$. Determine la condición que debe cumplir $p$ para que la gráfica de $h(x)$ no interseque al eje $x$.',
+            a: 3, b: -2, d: 0, p: 8,
+            sol: BASE_PROBLEMS[2].solution
+          },
+          {
+            stmt: 'Una recta $L_1$ tiene ecuación $3x - 4y + 8 = 0$. Otra recta $L_2$ es perpendicular a $L_1$ y pasa por el punto medio del segmento que une $A(1, 6)$ y $B(5, -2)$.',
+            bLabel: 'b) La función cuadrática $h(x) = 3x^2 - 12x + p$ no corta al eje $x$. Determine la condición que debe cumplir $p$ para que la gráfica de $h(x)$ no interseque al eje $x$.',
+            a: 4, b: 3, d: -18, p: 12,
+            sol: `
+              <p><strong>a) [4 puntos]</strong> $m_1 = \\frac{3}{4} \\Rightarrow m_2 = -\\frac{4}{3}$ y punto medio $M(3, 2)$. Ecuación: $y - 2 = -\\frac{4}{3}(x - 3) \\Rightarrow 4x + 3y - 18 = 0$ <strong>[M1][A1][M1][A1]</strong>.</p>
+              <p class="mt-2"><strong>b) [3 puntos]</strong> $\\Delta < 0 \\Rightarrow (-12)^2 - 4(3)(p) < 0 \\Rightarrow 144 - 12p < 0 \\Rightarrow p > 12$ <strong>[M1][A1][A1]</strong>.</p>
+            `
+          },
+          {
+            stmt: 'Una recta $L_1$ tiene ecuación $x + 2y - 10 = 0$. Otra recta $L_2$ es perpendicular a $L_1$ y pasa por el punto medio del segmento que une $A(0, 7)$ y $B(4, 1)$.',
+            bLabel: 'b) La función cuadrática $h(x) = x^2 - 6x + p$ no corta al eje $x$. Determine la condición que debe cumplir $p$ para que la gráfica de $h(x)$ no interseque al eje $x$.',
+            a: 2, b: -1, d: 0, p: 9,
+            sol: `
+              <p><strong>a) [4 puntos]</strong> $m_1 = -\\frac{1}{2} \\Rightarrow m_2 = 2$ y punto medio $M(2, 4)$. Ecuación: $y - 4 = 2(x - 2) \\Rightarrow 2x - y = 0$ <strong>[M1][A1][M1][A1]</strong>.</p>
+              <p class="mt-2"><strong>b) [3 puntos]</strong> $\\Delta < 0 \\Rightarrow (-6)^2 - 4(1)(p) < 0 \\Rightarrow 36 - 4p < 0 \\Rightarrow p > 9$ <strong>[M1][A1][A1]</strong>.</p>
+            `
+          }
+        ];
+        const v = variants[nextVar];
+        prob.variantIndex = nextVar;
+        prob.statement = v.stmt;
+        prob.parts[1].label = v.bLabel;
+        prob.parts[0].inputs[0].expected = v.a;
+        prob.parts[0].inputs[1].expected = v.b;
+        prob.parts[0].inputs[2].expected = v.d;
+        prob.parts[1].inputs[0].expected = v.p;
+        prob.solution = v.sol;
+        ['3a_a', '3a_b', '3a_d', '3b_p'].forEach(id => delete state.userAnswers[id]);
+      } else if (probId === 12) {
+        const variants = [
+          { m: 3, c: 1, poly: 'k^2 + 2*k + 9', polyTex: 'k^2 + 2k + 9', p: 1, q: 8 },
+          { m: 4, c: 1, poly: 'k^2 + 4*k + 16', polyTex: 'k^2 + 4k + 16', p: 2, q: 12 },
+          { m: 5, c: 2, poly: 'k^2 + 2*k + 25', polyTex: 'k^2 + 2k + 25', p: 1, q: 24 }
+        ];
+        const v = variants[nextVar];
+        prob.variantIndex = nextVar;
+        prob.statement = `Considere la familia de parábolas $y = kx^2 + (k + ${v.m})x + ${v.c}$, donde $k \\in \\mathbb{R},\\; k \\neq 0$.`;
+        prob.parts[0].inputs[0].targetExpr = v.poly;
+        prob.parts[1].inputs[0].expected = v.p;
+        prob.parts[1].inputs[1].expected = v.q;
+        prob.hints = [
+          `Identifica $a = k$, $b = k + ${v.m}$ y $c = ${v.c}$. Expande $\\Delta = (k + ${v.m})^2 - 4(k)(${v.c})$ reduciendo términos semejantes.`,
+          `Completa el cuadrado en $${v.polyTex} = (k + ${v.p})^2 + ${v.q}$. Como $(k + ${v.p})^2 \\ge 0$ para todo $k \\in \\mathbb{R}$, $\\Delta \\ge ${v.q} > 0$.`
+        ];
+        prob.solution = `
+          <p><strong>a) [3 puntos]</strong> Aplicando $\\Delta = b^2 - 4ac$ con $a = k$, $b = k + ${v.m}$ y $c = ${v.c}$:</p>
+          <p>$\\Delta = (k + ${v.m})^2 - 4(k)(${v.c}) = ${v.polyTex}$ <strong>[M1][M1][A1]</strong>.</p>
+          <p class="mt-2"><strong>b) [2 puntos]</strong> Completando el cuadrado: $\\Delta = (k + ${v.p})^2 + ${v.q}$ ($p = ${v.p},\\; q = ${v.q}$) <strong>[M1][A1]</strong>.</p>
+          <p class="mt-2"><strong>c) [3 puntos]</strong> Como $(k + ${v.p})^2 \\ge 0$, se cumple $\\Delta \\ge ${v.q} > 0$ para todo $k \\in \\mathbb{R}$ <strong>[R1]</strong>. La parábola siempre tiene <strong>$2$ cortes</strong> reales distintos con el eje $x$ <strong>[A1]</strong> y <strong>no existe ningún valor de $k$</strong> de tangencia <strong>[R1]</strong>.</p>
+        `;
+        ['12a_delta', '12b_p', '12b_q', '12c_cuts', '12c_tan'].forEach(id => delete state.userAnswers[id]);
+      }
+
+      state.solutionsRevealed[probId] = false;
+      state.hintsRevealed[probId] = 0;
+      saveState();
+      renderActiveProblem();
+      showToast(`Nueva variante generada para el Problema ${probId}.`, '🎲');
+    }
+
+    // =========================================================================
+    // MODO CRONOMETRADO (1.2 MIN / PUNTO)
+    // =========================================================================
+    function setStudyMode(mode) {
+      state.mode = mode;
+      saveState();
+      const freeBtn = document.getElementById('mode-free-btn');
+      const timedBtn = document.getElementById('mode-timed-btn');
+      const controls = document.getElementById('timed-controls');
+
+      if (mode === 'timed') {
+        if (freeBtn) freeBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition';
+        if (timedBtn) timedBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-700 text-white shadow-2xs transition';
+        if (controls) {
+          controls.classList.remove('hidden');
+          controls.classList.add('flex');
+        }
+        resetProblemTimer();
+      } else {
+        if (freeBtn) freeBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-vcsp-navy text-white shadow-2xs transition';
+        if (timedBtn) timedBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition';
+        if (controls) {
+          controls.classList.add('hidden');
+          controls.classList.remove('flex');
+        }
+        if (timerInterval) clearInterval(timerInterval);
+      }
+    }
+
+    function updateTimerDisplay() {
+      const el = document.getElementById('timer-display');
+      if (!el) return;
+      const mins = Math.floor(Math.max(0, timerSecondsLeft) / 60);
+      const secs = Math.max(0, timerSecondsLeft) % 60;
+      el.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function resetProblemTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      const prob = PROBLEMS.find(p => p.id === state.activeProblemId) || PROBLEMS[0];
+      timerSecondsLeft = Math.round(prob.points * 72);
+      timerPaused = false;
+      const pauseBtn = document.getElementById('timer-pause-btn');
+      if (pauseBtn) pauseBtn.textContent = 'Pausar';
+      updateTimerDisplay();
+
+      timerInterval = setInterval(() => {
+        if (timerPaused || state.mode !== 'timed') return;
+        timerSecondsLeft -= 1;
+        updateTimerDisplay();
+        if (timerSecondsLeft <= 0) {
+          clearInterval(timerInterval);
+          showToast('⏱️ Tiempo sugerido IB completado para este problema.', '⏱️');
+        }
+      }, 1000);
+    }
+
+    function toggleTimerPause() {
+      timerPaused = !timerPaused;
+      const btn = document.getElementById('timer-pause-btn');
+      if (btn) btn.textContent = timerPaused ? 'Reanudar' : 'Pausar';
+    }
+
+    // =========================================================================
+    // SPRINT DE FÓRMULAS (60 SEGUNDOS)
+    // =========================================================================
+    function openSprintModal() {
+      openModal('sprint-modal');
+      if (sprintInterval) clearInterval(sprintInterval);
+      sprintTimeLeft = 60;
+      sprintScore = 0;
+      nextSprintQuestion();
+
+      sprintInterval = setInterval(() => {
+        sprintTimeLeft -= 1;
+        const tEl = document.getElementById('sprint-time-left');
+        if (tEl) tEl.textContent = `${sprintTimeLeft}s`;
+        if (sprintTimeLeft <= 0) {
+          clearInterval(sprintInterval);
+          if (sprintScore > state.sprintBest) {
+            state.sprintBest = sprintScore;
+            saveState();
+          }
+          const body = document.getElementById('sprint-modal-body');
+          if (body) {
+            body.innerHTML = `
+              <div class="text-center py-6 space-y-3">
+                <div class="text-4xl">⚡</div>
+                <h4 class="text-lg font-extrabold text-slate-900">¡Tiempo completado!</h4>
+                <p class="text-sm text-slate-600">Aciertos en esta ronda: <strong class="text-vcsp-navy">${sprintScore}</strong> · Récord personal: <strong class="text-emerald-700">${state.sprintBest}</strong></p>
+                <button onclick="openSprintModal()" class="px-5 py-2.5 rounded-xl bg-sky-700 hover:bg-sky-800 text-white text-xs font-extrabold">Jugar otra ronda de 60s</button>
+              </div>
+            `;
+          }
+        }
+      }, 1000);
+    }
+
+    function closeSprintModal() {
+      if (sprintInterval) clearInterval(sprintInterval);
+      closeModal('sprint-modal');
+    }
+
+    function nextSprintQuestion() {
+      const idx = Math.floor(Math.random() * SPRINT_QUESTIONS.length);
+      sprintCurrentQ = SPRINT_QUESTIONS[idx];
+      const body = document.getElementById('sprint-modal-body');
+      if (!body) return;
+
+      body.innerHTML = `
+        <div class="flex items-center justify-between bg-slate-100 px-4 py-2.5 rounded-xl text-xs font-bold">
+          <span>Tiempo: <strong id="sprint-time-left" class="text-rose-700 font-mono text-sm">${sprintTimeLeft}s</strong></span>
+          <span>Aciertos: <strong class="text-vcsp-navy">${sprintScore}</strong></span>
+          <span>Récord: <strong class="text-emerald-700">${state.sprintBest}</strong></span>
+        </div>
+        <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200 text-sm font-semibold text-slate-800 leading-relaxed">
+          ${sprintCurrentQ.prompt}
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          ${sprintCurrentQ.options.map(code => `
+            <button onclick="answerSprintQuestion('${code}')" class="p-3.5 rounded-xl bg-white hover:bg-vcsp-navy hover:text-white border-2 border-slate-200 hover:border-vcsp-navy text-sm font-extrabold transition">
+              Subtema ${code}
+            </button>
+          `).join('')}
+        </div>
+      `;
+      renderMathIn(body);
+    }
+
+    function answerSprintQuestion(code) {
+      if (!sprintCurrentQ) return;
+      if (code === sprintCurrentQ.code) {
+        sprintScore += 1;
+        if (sprintScore > state.sprintBest) {
+          state.sprintBest = sprintScore;
+          saveState();
+        }
+        showToast(`¡Correcto! Subtema ${code}.`, '⚡');
+      } else {
+        showToast(`Era el Subtema ${sprintCurrentQ.code}.`, '📖');
+      }
+      nextSprintQuestion();
+    }
+
+    // =========================================================================
+    // CAZA DE ERRORES TÍPICOS IB
+    // =========================================================================
+    function openErrorHuntModal() {
+      openModal('error-hunt-modal');
+      const body = document.getElementById('error-hunt-modal-body');
+      if (!body) return;
+
+      body.innerHTML = ERROR_CASES.map((c, cIdx) => {
+        const solved = state.errorHuntSolved.includes(cIdx);
+        return `
+          <div class="p-4 rounded-2xl border ${solved ? 'border-emerald-300 bg-emerald-50/40' : 'border-slate-200 bg-slate-50'} space-y-2.5">
+            <div class="flex items-center justify-between gap-2">
+              <h4 class="text-xs sm:text-sm font-extrabold text-purple-950">${c.title}</h4>
+              ${solved ? '<span class="text-xs font-extrabold text-emerald-700">✅ Detectado</span>' : ''}
+            </div>
+            <p class="text-xs text-slate-700 bg-white p-3 rounded-xl border border-slate-200">${c.work}</p>
+            <div class="space-y-1.5">
+              ${c.options.map((opt, oIdx) => `
+                <button onclick="answerErrorHunt(${cIdx}, ${oIdx})" class="w-full text-left px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-purple-50 text-xs font-medium text-slate-800 transition">
+                  ${String.fromCharCode(65 + oIdx)}) ${opt}
+                </button>
+              `).join('')}
+            </div>
+            <div id="eh-fb-${cIdx}" class="${solved ? '' : 'hidden'} p-3 rounded-xl bg-emerald-100/80 text-xs text-emerald-950 font-medium">
+              <strong>Explicación IB:</strong> ${c.explanation}
+            </div>
+          </div>
+        `;
+      }).join('');
+      renderMathIn(body);
+    }
+
+    function answerErrorHunt(cIdx, oIdx) {
+      const c = ERROR_CASES[cIdx];
+      const fb = document.getElementById(`eh-fb-${cIdx}`);
+      if (!c || !fb) return;
+
+      if (oIdx === c.correct) {
+        if (!state.errorHuntSolved.includes(cIdx)) {
+          state.errorHuntSolved.push(cIdx);
+          saveState();
+        }
+        fb.classList.remove('hidden');
+        showToast('¡Exacto! Has detectado la trampa conceptual IB.', '🕵️');
+        openErrorHuntModal();
+      } else {
+        showToast('No es ese el fallo principal. Revisa la condición matemática.', '🤔');
+      }
+    }
+
+    // =========================================================================
+    // DIAGNÓSTICO IB, BANDAS DE CALIFICACIÓN PD IB Y EXIT TICKET
+    // =========================================================================
+    const IB_GRADE_BANDS = [
+      { band: 7, minPct: 80, maxPct: 100, ptsRange: '72 – 90 pts', label: 'Excelente', bg: 'bg-emerald-600', softBg: 'bg-emerald-50', text: 'text-emerald-900', border: 'border-emerald-400', hex: '#059669' },
+      { band: 6, minPct: 68, maxPct: 79,  ptsRange: '61 – 71 pts', label: 'Muy bueno', bg: 'bg-teal-600', softBg: 'bg-teal-50', text: 'text-teal-900', border: 'border-teal-400', hex: '#0d9488' },
+      { band: 5, minPct: 56, maxPct: 67,  ptsRange: '50 – 60 pts', label: 'Bueno', bg: 'bg-sky-600', softBg: 'bg-sky-50', text: 'text-sky-900', border: 'border-sky-400', hex: '#0284c7' },
+      { band: 4, minPct: 44, maxPct: 55,  ptsRange: '40 – 49 pts', label: 'Satisfactorio', bg: 'bg-indigo-600', softBg: 'bg-indigo-50', text: 'text-indigo-900', border: 'border-indigo-400', hex: '#4f46e5' },
+      { band: 3, minPct: 32, maxPct: 43,  ptsRange: '29 – 39 pts', label: 'Mediocre', bg: 'bg-amber-500', softBg: 'bg-amber-50', text: 'text-amber-900', border: 'border-amber-400', hex: '#d97706' },
+      { band: 2, minPct: 20, maxPct: 31,  ptsRange: '18 – 28 pts', label: 'Elemental', bg: 'bg-orange-500', softBg: 'bg-orange-50', text: 'text-orange-900', border: 'border-orange-400', hex: '#ea580c' },
+      { band: 1, minPct: 0,  maxPct: 19,  ptsRange: '0 – 17 pts',  label: 'Muy elemental', bg: 'bg-rose-600', softBg: 'bg-rose-50', text: 'text-rose-900', border: 'border-rose-400', hex: '#e11d48' }
+    ];
+
+    function getIBGradeInfo(earnedPts, totalPts) {
+      const pct = totalPts > 0 ? Math.round((earnedPts / totalPts) * 100) : 0;
+      const current = IB_GRADE_BANDS.find(b => pct >= b.minPct) || IB_GRADE_BANDS[IB_GRADE_BANDS.length - 1];
+      let nextHint = '¡Has alcanzado la máxima calificación del Programa del Diploma IB (Banda 7)!';
+      if (current.band < 7) {
+        const nextBandObj = IB_GRADE_BANDS.find(b => b.band === current.band + 1);
+        const minPtsNeeded = Math.ceil((nextBandObj.minPct / 100) * totalPts);
+        const diff = Math.max(1, minPtsNeeded - earnedPts);
+        nextHint = `Te faltan ${diff} pt${diff === 1 ? '' : 's'} para alcanzar la Banda ${nextBandObj.band} (${nextBandObj.label}).`;
+      }
+      return { ...current, pct, nextHint };
+    }
+
+    async function computeIntegrityHash(payload) {
+      try {
+        if (window.crypto && window.crypto.subtle) {
+          const enc = new TextEncoder().encode(payload + '|VCSP-IB-2026');
+          const buf = await window.crypto.subtle.digest('SHA-256', enc);
+          const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+          return hex.slice(0, 12).toUpperCase();
+        }
+      } catch (e) {}
+      let hash = 2166136261;
+      for (let i = 0; i < payload.length; i++) {
+        hash ^= payload.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+      return (hash >>> 0).toString(16).toUpperCase().padStart(8, '0');
+    }
+
+    async function updateExitTicketPreview() {
+      const earnedPts = PROBLEMS.filter(p => state.completedIds.includes(p.id)).reduce((s, p) => s + p.points, 0);
+      const totalPts = PROBLEMS.reduce((s, p) => s + p.points, 0);
+      const rawPayload = `${state.studentName}|${state.studentSection}|${state.completedIds.slice().sort().join(',')}|${earnedPts}|${state.sprintBest}|${state.errorHuntSolved.length}`;
+      const seal = await computeIntegrityHash(rawPayload);
+
+      const nameDisplay = document.getElementById('ticket-preview-name');
+      const secDisplay = document.getElementById('ticket-preview-section');
+      const sealDisplay = document.getElementById('ticket-preview-seal');
+      if (nameDisplay) nameDisplay.textContent = (state.studentName || '').trim() || 'Estudiante sin registrar';
+      if (secDisplay) secDisplay.textContent = (state.studentSection || '').trim() || 'Sin sección';
+      if (sealDisplay) sealDisplay.textContent = seal;
+    }
+
+    async function openDiagnosticModal() {
+      openModal('diagnostic-modal');
+      const body = document.getElementById('diagnostic-modal-body');
+      if (!body) return;
+
+      const topics = [
+        { id: '1', short: 'T1 Álgebra', name: 'Tema 1: Aritmética y Álgebra' },
+        { id: '2', short: 'T2 Funciones', name: 'Tema 2: Funciones' },
+        { id: '3', short: 'T3 Trig.', name: 'Tema 3: Geometría y Trigonometría' },
+        { id: '4', short: 'T4 Estad./Prob.', name: 'Tema 4: Estadística y Probabilidad' }
+      ];
+
+      const topicStats = topics.map(t => {
+        const list = PROBLEMS.filter(p => p.topic === t.id);
+        const done = list.filter(p => state.completedIds.includes(p.id));
+        const ptsDone = done.reduce((s, p) => s + p.points, 0);
+        const ptsTotal = list.reduce((s, p) => s + p.points, 0);
+        const pct = Math.round((ptsDone / ptsTotal) * 100);
+        return { ...t, doneCount: done.length, totalCount: list.length, ptsDone, ptsTotal, pct };
+      });
+
+      const topicRows = topicStats.map(t => `
+        <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+          <div class="flex items-center justify-between text-xs font-bold">
+            <span class="text-slate-800">${t.name}</span>
+            <span class="text-vcsp-navy">${t.doneCount}/${t.totalCount} prob. (${t.ptsDone}/${t.ptsTotal} pts · ${t.pct}%)</span>
+          </div>
+          <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+            <div class="h-full bg-emerald-600 transition-all" style="width: ${t.pct}%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const earnedPts = PROBLEMS.filter(p => state.completedIds.includes(p.id)).reduce((s, p) => s + p.points, 0);
+      const totalPts = PROBLEMS.reduce((s, p) => s + p.points, 0);
+      const gradeInfo = getIBGradeInfo(earnedPts, totalPts);
+      const nameVal = (state.studentName || '').replace(/"/g, '&quot;');
+      const secVal = (state.studentSection || '').replace(/"/g, '&quot;');
+      const rawPayload = `${state.studentName}|${state.studentSection}|${state.completedIds.slice().sort().join(',')}|${earnedPts}|${state.sprintBest}|${state.errorHuntSolved.length}`;
+      const seal = await computeIntegrityHash(rawPayload);
+      const todayStr = new Date().toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+      const bandsHtml = IB_GRADE_BANDS.slice().reverse().map(b => {
+        const isCurrent = b.band === gradeInfo.band;
+        return `
+          <div class="rounded-xl p-2 text-center border transition-all ${
+            isCurrent
+              ? `${b.softBg} ${b.border} ring-2 ring-vcsp-navy/30 shadow-xs scale-[1.03]`
+              : 'bg-white border-slate-200 opacity-75'
+          }">
+            <div class="inline-flex items-center justify-center w-6 h-6 rounded-lg text-xs font-extrabold text-white ${b.bg} mb-1">
+              ${b.band}
+            </div>
+            <div class="text-[10px] font-extrabold text-slate-800 leading-tight">${b.ptsRange}</div>
+            <div class="text-[9px] font-semibold text-slate-500">${b.minPct}–${b.maxPct}%</div>
+            <div class="text-[9px] font-bold ${isCurrent ? b.text : 'text-slate-400'} truncate mt-0.5">${b.label}</div>
+          </div>
+        `;
+      }).join('');
+
+      body.innerHTML = `
+        <details class="rounded-xl border border-slate-200 bg-slate-50/60 overflow-hidden">
+          <summary class="px-3.5 py-2 text-xs font-extrabold text-slate-700 cursor-pointer select-none flex items-center justify-between">
+            <span>📈 Desglose de Avance por Unidad Temática (Temas 1–4)</span>
+            <span class="text-[11px] text-vcsp-navy">Ver detalle</span>
+          </summary>
+          <div class="p-3 pt-1 space-y-2 border-t border-slate-200/80">
+            ${topicRows}
+          </div>
+        </details>
+
+        <!-- Datos del Estudiante -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
+          <div>
+            <label for="cert-name" class="block text-[11px] font-bold text-slate-600 mb-1">Nombre y Apellido del Estudiante</label>
+            <input id="cert-name" type="text" value="${nameVal}" oninput="state.studentName=this.value; saveState(); updateExitTicketPreview()" placeholder="Ej. Camila Mendoza" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-vcsp-navy/30" />
+          </div>
+          <div>
+            <label for="cert-section" class="block text-[11px] font-bold text-slate-600 mb-1">Salón / Sección</label>
+            <input id="cert-section" type="text" value="${secVal}" oninput="state.studentSection=this.value; saveState(); updateExitTicketPreview()" placeholder="Ej. 4.º A - San Pedro" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-vcsp-navy/30" />
+          </div>
+        </div>
+
+        <!-- TARJETA VISUAL EXIT TICKET PD IB -->
+        <div id="exit-ticket-card" class="rounded-2xl border-2 border-vcsp-navy bg-white shadow-md overflow-hidden">
+          <div class="bg-gradient-to-r from-vcsp-navyDark via-vcsp-navy to-vcsp-navyLight text-white px-4 py-3 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">🎟️</span>
+              <div>
+                <div class="text-[10px] font-bold uppercase tracking-widest text-vcsp-gold">Colegio San Pedro • Programa del Diploma IB</div>
+                <div class="text-xs sm:text-sm font-extrabold">EXIT TICKET — Mock Final Año 1 (MAE NM)</div>
+              </div>
+            </div>
+            <span class="text-[11px] font-mono bg-white/15 px-2.5 py-1 rounded-lg border border-white/20">${todayStr}</span>
+          </div>
+
+          <div class="p-4 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-dashed border-slate-300 text-xs">
+              <div>
+                <span class="text-slate-400 font-semibold">Estudiante:</span>
+                <strong id="ticket-preview-name" class="text-slate-900 ml-1">${(state.studentName || '').trim() || 'Estudiante sin registrar'}</strong>
+              </div>
+              <div>
+                <span class="text-slate-400 font-semibold">Sección:</span>
+                <strong id="ticket-preview-section" class="text-slate-900 ml-1">${(state.studentSection || '').trim() || 'Sin sección'}</strong>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-stretch">
+              <div class="sm:col-span-5 rounded-2xl p-3.5 ${gradeInfo.softBg} border-2 ${gradeInfo.border} flex flex-col items-center justify-center text-center">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider ${gradeInfo.text}">Calificación Final PD IB</span>
+                <div class="flex items-baseline gap-1.5 my-1">
+                  <span class="text-3xl sm:text-4xl font-black ${gradeInfo.text}">Banda ${gradeInfo.band}</span>
+                  <span class="text-xs font-bold text-slate-500">/ 7</span>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold text-white ${gradeInfo.bg}">
+                  ${gradeInfo.label}
+                </span>
+              </div>
+
+              <div class="sm:col-span-7 rounded-2xl p-3.5 bg-slate-50 border border-slate-200 flex flex-col justify-between space-y-2">
+                <div class="grid grid-cols-3 gap-2 text-center">
+                  <div class="bg-white p-2 rounded-xl border border-slate-200">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase">Puntaje</div>
+                    <div class="text-sm sm:text-base font-extrabold text-vcsp-navy">${earnedPts}/${totalPts}</div>
+                  </div>
+                  <div class="bg-white p-2 rounded-xl border border-slate-200">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase">Logro</div>
+                    <div class="text-sm sm:text-base font-extrabold text-vcsp-navy">${gradeInfo.pct}%</div>
+                  </div>
+                  <div class="bg-white p-2 rounded-xl border border-slate-200">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase">Problemas</div>
+                    <div class="text-sm sm:text-base font-extrabold text-vcsp-navy">${state.completedIds.length}/${PROBLEMS.length}</div>
+                  </div>
+                </div>
+                <div class="text-[11px] text-slate-600 bg-white px-3 py-1.5 rounded-xl border border-slate-200/80">
+                  🎯 <strong>Meta siguiente nivel:</strong> ${gradeInfo.nextHint}
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-[11px] font-extrabold text-slate-600">
+                <span>📏 Bandas de Calificación PD IB (MAE NM — Base 90 pts)</span>
+                <span class="text-[10px] font-normal text-slate-400">Escala oficial 1 a 7</span>
+              </div>
+              <div class="grid grid-cols-7 gap-1.5">
+                ${bandsHtml}
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-dashed border-slate-300 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-600">
+              <div class="flex flex-wrap gap-2">
+                ${topicStats.map(t => `<span class="px-2 py-0.5 rounded bg-slate-100 font-semibold">${t.short}: <strong>${t.ptsDone}/${t.ptsTotal}</strong></span>`).join('')}
+                <span class="px-2 py-0.5 rounded bg-sky-50 text-sky-900 font-semibold">⚡ Sprint: <strong>${state.sprintBest}</strong></span>
+                <span class="px-2 py-0.5 rounded bg-purple-50 text-purple-900 font-semibold">🕵️ Errores: <strong>${state.errorHuntSolved.length}/${ERROR_CASES.length}</strong></span>
+              </div>
+              <div class="font-mono text-[11px] text-slate-500">
+                Sello: <strong id="ticket-preview-seal" class="text-vcsp-navy">${seal}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instrucción rápida para Google Classroom -->
+        <div class="px-3.5 py-2.5 rounded-xl bg-sky-50 border border-sky-200 text-[11px] text-sky-950 leading-relaxed">
+          <strong>🎓 Entrega en Google Classroom:</strong> Descarga tu <em>Exit Ticket (PNG)</em> y súbelo en <strong>«Tu trabajo → + Agregar o crear → Archivo»</strong>, o pulsa <strong>«Copiar Exit Ticket»</strong> y pégalo en los comentarios privados de la tarea.
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="downloadExitTicketPNG()" class="px-4 py-2.5 rounded-xl bg-vcsp-navy hover:bg-vcsp-navyLight text-white text-xs font-extrabold shadow transition flex items-center gap-1.5">
+              <span>📥</span> Descargar Exit Ticket (PNG)
+            </button>
+            <button onclick="copyCertificateText()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs transition flex items-center gap-1.5">
+              <span>📋</span> Copiar Exit Ticket
+            </button>
+          </div>
+          <button id="btn-reset-progress" onclick="resetAllProgress()" class="px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-bold transition">
+            🗑️ Reiniciar progreso
+          </button>
+        </div>
+      `;
+    }
+
+    async function downloadExitTicketPNG() {
+      const student = (state.studentName || '').trim() || 'Estudiante sin registrar';
+      const section = (state.studentSection || '').trim() || 'Sin sección';
+      const earnedPts = PROBLEMS.filter(p => state.completedIds.includes(p.id)).reduce((s, p) => s + p.points, 0);
+      const totalPts = PROBLEMS.reduce((s, p) => s + p.points, 0);
+      const gradeInfo = getIBGradeInfo(earnedPts, totalPts);
+      const rawPayload = `${state.studentName}|${state.studentSection}|${state.completedIds.slice().sort().join(',')}|${earnedPts}|${state.sprintBest}|${state.errorHuntSolved.length}`;
+      const seal = await computeIntegrityHash(rawPayload);
+      const todayStr = new Date().toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+      const canvas = document.createElement('canvas');
+      const scale = 2;
+      const W = 920;
+      const H = 560;
+      canvas.width = W * scale;
+      canvas.height = H * scale;
+      const ctx = canvas.getContext('2d');
+      if (!ctx.roundRect) {
+        ctx.roundRect = function(x, y, w, h, r) {
+          this.beginPath();
+          this.moveTo(x + r, y);
+          this.arcTo(x + w, y, x + w, y + h, r);
+          this.arcTo(x + w, y + h, x, y + h, r);
+          this.arcTo(x, y + h, x, y, r);
+          this.arcTo(x, y, x + w, y, r);
+          this.closePath();
+          return this;
+        };
+      }
+      ctx.scale(scale, scale);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, H);
+
+      const grad = ctx.createLinearGradient(0, 0, W, 0);
+      grad.addColorStop(0, '#092744');
+      grad.addColorStop(0.5, '#0f3d68');
+      grad.addColorStop(1, '#1a5288');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, 92);
+
+      // Escudo vectorial Colegio San Pedro
+      ctx.save();
+      ctx.translate(28, 16);
+      ctx.beginPath();
+      ctx.moveTo(28, 2);
+      ctx.lineTo(54, 13);
+      ctx.lineTo(54, 34);
+      ctx.quadraticCurveTo(54, 52, 28, 60);
+      ctx.quadraticCurveTo(2, 52, 2, 34);
+      ctx.lineTo(2, 13);
+      ctx.closePath();
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#c59b27';
+      ctx.stroke();
+      ctx.fillStyle = '#0f3d68';
+      ctx.font = 'bold 22px Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('SP', 28, 38);
+      ctx.restore();
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#f6ecc9';
+      ctx.font = 'bold 12px Inter, Arial, sans-serif';
+      ctx.fillText('COLEGIO SAN PEDRO  •  PROGRAMA DEL DIPLOMA IB', 100, 36);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 22px Inter, Arial, sans-serif';
+      ctx.fillText('EXIT TICKET — Mock Final Año 1 (MAE NM)', 100, 66);
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#e0f2fe';
+      ctx.font = 'bold 14px monospace';
+      ctx.fillText(`Fecha: ${todayStr}`, W - 32, 54);
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#64748b';
+      ctx.font = 'bold 13px Inter, Arial, sans-serif';
+      ctx.fillText('ESTUDIANTE:', 32, 128);
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 17px Inter, Arial, sans-serif';
+      ctx.fillText(student, 126, 128);
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#64748b';
+      ctx.font = 'bold 13px Inter, Arial, sans-serif';
+      ctx.fillText(`SECCIÓN: ${section}`, W - 32, 128);
+
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(32, 146);
+      ctx.lineTo(W - 32, 146);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.strokeStyle = gradeInfo.hex;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(32, 166, 330, 148, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = gradeInfo.hex;
+      ctx.font = 'bold 12px Inter, Arial, sans-serif';
+      ctx.fillText('CALIFICACIÓN FINAL PD IB', 197, 194);
+
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '900 44px Inter, Arial, sans-serif';
+      ctx.fillText(`Banda ${gradeInfo.band} / 7`, 197, 248);
+
+      ctx.fillStyle = gradeInfo.hex;
+      ctx.beginPath();
+      ctx.roundRect(117, 266, 160, 30, 15);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 14px Inter, Arial, sans-serif';
+      ctx.fillText(gradeInfo.label.toUpperCase(), 197, 286);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(382, 166, 506, 148, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      const kpis = [
+        { title: 'PUNTAJE TOTAL', val: `${earnedPts} / ${totalPts} pts`, x: 466 },
+        { title: 'PORCENTAJE', val: `${gradeInfo.pct}%`, x: 635 },
+        { title: 'PROBLEMAS', val: `${state.completedIds.length} / ${PROBLEMS.length}`, x: 804 }
+      ];
+      kpis.forEach(k => {
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(k.x - 72, 182, 144, 74, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = 'bold 11px Inter, Arial, sans-serif';
+        ctx.fillText(k.title, k.x, 204);
+
+        ctx.fillStyle = '#0f3d68';
+        ctx.font = 'bold 20px Inter, Arial, sans-serif';
+        ctx.fillText(k.val, k.x, 236);
+      });
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#334155';
+      ctx.font = 'bold 12px Inter, Arial, sans-serif';
+      ctx.fillText(`Meta: ${gradeInfo.nextHint}`, 400, 288);
+
+      ctx.fillStyle = '#0f3d68';
+      ctx.font = 'bold 13px Inter, Arial, sans-serif';
+      ctx.fillText('BANDAS DE CALIFICACIÓN PD IB — MAE NM (BASE 90 PUNTOS)', 32, 344);
+
+      const orderedBands = IB_GRADE_BANDS.slice().reverse();
+      const boxW = 116;
+      const gap = 10;
+      orderedBands.forEach((b, idx) => {
+        const bx = 32 + idx * (boxW + gap);
+        const by = 358;
+        const isCur = b.band === gradeInfo.band;
+
+        ctx.fillStyle = isCur ? '#eff6ff' : '#ffffff';
+        ctx.strokeStyle = isCur ? b.hex : '#cbd5e1';
+        ctx.lineWidth = isCur ? 3 : 1.2;
+        ctx.beginPath();
+        ctx.roundRect(bx, by, boxW, 92, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = b.hex;
+        ctx.beginPath();
+        ctx.roundRect(bx + boxW / 2 - 16, by + 10, 32, 24, 6);
+        ctx.fill();
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 14px Inter, Arial, sans-serif';
+        ctx.fillText(String(b.band), bx + boxW / 2, by + 27);
+
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 12px Inter, Arial, sans-serif';
+        ctx.fillText(b.ptsRange, bx + boxW / 2, by + 52);
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '11px Inter, Arial, sans-serif';
+        ctx.fillText(`${b.minPct}–${b.maxPct}%`, bx + boxW / 2, by + 68);
+
+        ctx.fillStyle = isCur ? b.hex : '#475569';
+        ctx.font = 'bold 10px Inter, Arial, sans-serif';
+        ctx.fillText(b.label, bx + boxW / 2, by + 84);
+      });
+
+      ctx.save();
+      ctx.setLineDash([6, 6]);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(32, 474);
+      ctx.lineTo(W - 32, 474);
+      ctx.stroke();
+      ctx.restore();
+
+      const tSummary = ['1', '2', '3', '4'].map(tid => {
+        const list = PROBLEMS.filter(p => p.topic === tid);
+        const done = list.filter(p => state.completedIds.includes(p.id));
+        const pDone = done.reduce((s, p) => s + p.points, 0);
+        const pTot = list.reduce((s, p) => s + p.points, 0);
+        return `T${tid}: ${pDone}/${pTot}`;
+      }).join('  |  ');
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#334155';
+      ctx.font = 'bold 12px Inter, Arial, sans-serif';
+      ctx.fillText(`${tSummary}   •   Sprint: ${state.sprintBest} aciertos   •   Caza Errores: ${state.errorHuntSolved.length}/${ERROR_CASES.length}`, 32, 506);
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#0f3d68';
+      ctx.font = 'bold 13px monospace';
+      ctx.fillText(`Sello Verificación: ${seal}`, W - 32, 506);
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '11px Inter, Arial, sans-serif';
+      ctx.fillText('Colegio San Pedro · Programa del Diploma IB — Matemáticas: Análisis y Enfoques NM | 2026', W / 2, 538);
+
+      const link = document.createElement('a');
+      const safeName = student.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]/g, '_');
+      link.download = `Exit_Ticket_PDIB_${safeName}.png`;
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Exit Ticket descargado como PNG. Adjúntalo en tu tarea de Google Classroom.', '🎟️');
+    }
+
+    async function copyCertificateText() {
+      const student = (state.studentName || 'Estudiante sin nombre').trim();
+      const section = (state.studentSection || 'Sin sección').trim();
+      const earnedPts = PROBLEMS.filter(p => state.completedIds.includes(p.id)).reduce((s, p) => s + p.points, 0);
+      const totalPts = PROBLEMS.reduce((s, p) => s + p.points, 0);
+      const gradeInfo = getIBGradeInfo(earnedPts, totalPts);
+      const rawPayload = `${state.studentName}|${state.studentSection}|${state.completedIds.slice().sort().join(',')}|${earnedPts}|${state.sprintBest}|${state.errorHuntSolved.length}`;
+      const seal = await computeIntegrityHash(rawPayload);
+
+      const reportText = [
+        '====================================================',
+        '🎟️ EXIT TICKET — MOCK FINAL AÑO 1 PD IB (MAE NM)',
+        'Colegio San Pedro | Programa del Diploma IB',
+        '====================================================',
+        `Estudiante: ${student}`,
+        `Sección: ${section}`,
+        `Fecha: ${new Date().toLocaleDateString('es-PE')}`,
+        `Puntaje Total: ${earnedPts}/${totalPts} pts (${gradeInfo.pct}%)`,
+        `Calificación Final PD IB: BANDA ${gradeInfo.band} / 7 (${gradeInfo.label})`,
+        `Problemas dominados: ${state.completedIds.length}/12 (${state.completedIds.length ? state.completedIds.map(id => '#' + id).join(', ') : 'Ninguno aún'})`,
+        `Récord Sprint Fórmulas (60s): ${state.sprintBest} aciertos`,
+        `Caza de Errores IB: ${state.errorHuntSolved.length}/${ERROR_CASES.length}`,
+        `Escala Bandas PD IB (90 pts): B7(72-90) | B6(61-71) | B5(50-60) | B4(40-49) | B3(29-39) | B2(18-28) | B1(0-17)`,
+        `Sello de verificación: ${seal}`,
+        '===================================================='
+      ].join('\n');
+
+      const ta = document.createElement('textarea');
+      ta.value = reportText;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast('Exit Ticket copiado. Pégalo en un comentario privado de Google Classroom.', '📋');
+      } catch (e) {
+        showToast('No se pudo copiar automáticamente.', '⚠️');
+      }
+      document.body.removeChild(ta);
+    }
+
+    function resetAllProgress() {
+      const btn = document.getElementById('btn-reset-progress');
+      if (!resetConfirmPending) {
+        resetConfirmPending = true;
+        if (btn) btn.textContent = '⚠️ ¿Confirmar borrado total?';
+        resetConfirmTimer = setTimeout(() => {
+          resetConfirmPending = false;
+          if (btn) btn.textContent = '🗑️ Reiniciar progreso';
+        }, 4000);
+        return;
+      }
+
+      clearTimeout(resetConfirmTimer);
+      resetConfirmPending = false;
+      state = {
+        activeProblemId: 1,
+        topicFilter: 'all',
+        calcFilter: 'all',
+        mode: 'free',
+        completedIds: [],
+        userAnswers: {},
+        scratchpads: {},
+        hintsRevealed: {},
+        solutionsRevealed: {},
+        streak: 0,
+        sprintBest: 0,
+        errorHuntSolved: [],
+        studentName: state.studentName,
+        studentSection: state.studentSection
+      };
+      PROBLEMS = JSON.parse(JSON.stringify(BASE_PROBLEMS));
+      saveState();
+      closeModal('diagnostic-modal');
+      renderHeaderStats();
+      renderProblemList();
+      renderActiveProblem();
+      showToast('Progreso reiniciado correctamente.', '🗑️');
+    }
+
+    // =========================================================================
+    // GESTIÓN DE MODALES, NOTIFICACIONES Y ARRANQUE
+    // =========================================================================
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('hidden');
+      renderMathIn(el);
+    }
+
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add('hidden');
+    }
+
+    let toastTimeout = null;
+    function showToast(msg, icon = 'ℹ️') {
+      const box = document.getElementById('toast-box');
+      const msgEl = document.getElementById('toast-message');
+      const iconEl = document.getElementById('toast-icon');
+      if (!box || !msgEl || !iconEl) return;
+
+      iconEl.textContent = icon;
+      msgEl.textContent = msg;
+      box.classList.remove('hidden');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        box.classList.add('hidden');
+      }, 3400);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        ['formula-modal', 'error-hunt-modal', 'diagnostic-modal'].forEach(closeModal);
+        const sprintEl = document.getElementById('sprint-modal');
+        if (sprintEl && !sprintEl.classList.contains('hidden')) {
+          closeSprintModal();
+        }
+      }
+    });
+
+    // Exponer explícitamente todos los manejadores de eventos en window
+    Object.assign(window, {
+      selectProblem,
+      navigateProblem,
+      setTopicFilter,
+      setCalcFilter,
+      insertSymbol,
+      checkProblemAnswers,
+      revealNextHint,
+      toggleSolution,
+      markSelfVerified,
+      generateVariant,
+      setStudyMode,
+      resetProblemTimer,
+      toggleTimerPause,
+      openSprintModal,
+      closeSprintModal,
+      answerSprintQuestion,
+      openErrorHuntModal,
+      answerErrorHunt,
+      updateExitTicketPreview,
+      openDiagnosticModal,
+      downloadExitTicketPNG,
+      copyCertificateText,
+      resetAllProgress,
+      openModal,
+      closeModal
+    });
+
+    function initApp() {
+      loadState();
+      const topicSel = document.getElementById('topic-filter-select');
+      const calcSel = document.getElementById('calc-filter-select');
+      if (topicSel) topicSel.value = state.topicFilter;
+      if (calcSel) calcSel.value = state.calcFilter;
+      setStudyMode(state.mode || 'free');
+      renderHeaderStats();
+      renderProblemList();
+      renderActiveProblem();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+  </script>
+</body>
+</html>
